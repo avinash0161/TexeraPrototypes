@@ -8,6 +8,6 @@ namespace TexeraOrleansPrototype
 {
     public interface IScanOperator : IGrainWithIntegerKey
     {
-        Task SubmitTuples(Tuple row);
+        Task SubmitTuples(List<Tuple> rows);
     }
 }

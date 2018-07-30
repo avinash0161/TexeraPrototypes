@@ -68,10 +68,12 @@ namespace TexeraOrleansPrototype
                         
                         var sensor = client.GetGrain<IScanOperator>(500);
 
-                        foreach(Tuple row in rows)
-                        {
-                            Task t = sensor.SubmitTuples(row);
-                        }
+                        sensor.SubmitTuples(rows);
+
+                        // foreach(Tuple row in rows)
+                        // {
+                        //     Task t = sensor.SubmitTuples(row);
+                        // }
                         
                         // await t;
                         // Console.WriteLine("Client Task Status - "+t.Status);
