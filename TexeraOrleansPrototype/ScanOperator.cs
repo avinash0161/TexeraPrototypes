@@ -9,14 +9,25 @@ namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
-        public Task SubmitTuples(List<Tuple> rows) {
+        public bool pause = false; 
+        public List<Tuple> pausedRows = new List<Tuple>();
+        public Task SubmitTuples(List<Tuple> rows) 
+        {
+            if(pause)
+            {
+                pausedRows.AddRange(rows);
+                return Task.CompletedTask;
+            }
 
             IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(500);
-            Console.WriteLine("Scan operator received the temperature");
+            Console.WriteLine("Scan operator received the tuples");
 
             foreach(Tuple row in rows)
             {
+
+                Console.WriteLine("Scan operator sending next tuple with id "+ row.id);
                 nextOperator.SubmitTuples(row);
+                // Thread.Sleep(2000);
             }
 
             return Task.CompletedTask;
@@ -24,6 +35,25 @@ namespace TexeraOrleansPrototype
             // await x;
             // return x;
             // return;
+        }
+
+        public Task PauseOperator()
+        {
+            pause = true;
+            return Task.CompletedTask;
+        }
+
+        public Task ResumeOperator()
+        {
+            pause = false;
+            
+            if(pausedRows.Count > 0)
+            {
+                SubmitTuples(pausedRows);
+                pausedRows.Clear();
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

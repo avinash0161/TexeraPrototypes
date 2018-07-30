@@ -11,5 +11,7 @@ namespace TexeraOrleansPrototype
         Task<Guid> GetStreamGuid();
 
         Task SubmitTuples(Tuple row);
+        Task PauseOperator();
+        Task ResumeOperator();
     }
 }

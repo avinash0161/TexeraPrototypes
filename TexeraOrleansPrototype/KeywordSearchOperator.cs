@@ -10,13 +10,21 @@ namespace TexeraOrleansPrototype
     public class KeywordSearchOperator : Grain, IKeywordSearchOperator
     {
         private Guid guid = Guid.NewGuid();
-
+        public bool pause = false; 
+        public List<Tuple> pausedRows = new List<Tuple>();
         public Task<Guid> GetStreamGuid()
         {
             return Task.FromResult(guid);
         }
         public Task SubmitTuples(Tuple row) {
-            Console.WriteLine("Keyword operator received the temperature");
+            // Thread.Sleep(3000);
+            if(pause)
+            {
+                pausedRows.Add(row);
+                return Task.CompletedTask;
+            }
+            
+            Console.WriteLine("Keyword operator received the tuple with id " + row.id);
             var streamProvider = GetStreamProvider("SMSProvider");
             //Get the reference to a stream
             // Console.WriteLine("Keyword side guid is " + guid);
@@ -30,6 +38,28 @@ namespace TexeraOrleansPrototype
 
             return Task.CompletedTask;
             // return;
+        }
+
+        public Task PauseOperator()
+        {
+            pause = true;
+            return Task.CompletedTask;
+        }
+
+        public Task ResumeOperator()
+        {
+            pause = false;
+            
+            if(pausedRows.Count > 0)
+            {
+                foreach(Tuple row in pausedRows)
+                {
+                    SubmitTuples(row);
+                }
+                pausedRows.Clear();
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

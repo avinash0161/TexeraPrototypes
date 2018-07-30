@@ -49,7 +49,7 @@ namespace TexeraOrleansPrototype
 
                     List<Tuple> rows = new List<Tuple>();
                     rows.Add(new Tuple(1, "when it rains it pours", 34));
-                    rows.Add(new Tuple(2, "the rains it raineth everyday", 4));
+                    rows.Add(new Tuple(2, "the rains it raineth everyday", 34));
                     rows.Add(new Tuple(3, "if the aim is total abject embarrassment", 34));
                     rows.Add(new Tuple(4, "a star winked at me btwn the apricot", 34));
                     rows.Add(new Tuple(5, "it rains and pours", 34));
@@ -62,23 +62,57 @@ namespace TexeraOrleansPrototype
 
                     await stream.SubscribeAsync(new StreamObserver());
 
+                    Task.Run(() => AcceptInputForPauseResume(client));
+
                     while (true)
                     {
                         Console.WriteLine("Client giving another request");
                         
                         var sensor = client.GetGrain<IScanOperator>(500);
 
-                        sensor.SubmitTuples(rows);
+                        // sensor.SubmitTuples(rows);
 
-                        // foreach(Tuple row in rows)
-                        // {
-                        //     Task t = sensor.SubmitTuples(row);
-                        // }
+                        foreach(Tuple row in rows)
+                        {
+                            Task t = sensor.SubmitTuples(new List<Tuple>(){row});
+                            Thread.Sleep(1000);
+                        }
                         
                         // await t;
                         // Console.WriteLine("Client Task Status - "+t.Status);
-                        Thread.Sleep(10000);
+                        Thread.Sleep(30000);
+                        Console.WriteLine("--------------------------");
                     }
+                }
+            }
+        }
+
+        public static void AcceptInputForPauseResume(IClusterClient client)
+        {
+            while(true)
+            {
+                char input = Console.ReadKey().KeyChar;
+                if (input == 'p')
+                {
+                    // Console.WriteLine("Pause Called");
+                    IScanOperator  scan = client.GetGrain<IScanOperator>(500);
+                    IFilterOperator filter = client.GetGrain<IFilterOperator>(500);
+                    IKeywordSearchOperator keyword = client.GetGrain<IKeywordSearchOperator>(500);
+                    
+                    scan.PauseOperator();
+                    filter.PauseOperator();
+                    keyword.PauseOperator();
+                }
+                else if (input == 'r')
+                {
+                    // Console.WriteLine("Resume Called");
+                    IScanOperator  scan = client.GetGrain<IScanOperator>(500);
+                    IFilterOperator filter = client.GetGrain<IFilterOperator>(500);
+                    IKeywordSearchOperator keyword = client.GetGrain<IKeywordSearchOperator>(500);
+                    
+                    scan.ResumeOperator();
+                    filter.ResumeOperator();
+                    keyword.ResumeOperator();
                 }
             }
         }

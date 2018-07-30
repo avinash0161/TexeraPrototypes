@@ -9,10 +9,17 @@ namespace TexeraOrleansPrototype
 {
     public class FilterOperator : Grain, IFilterOperator
     {
+        public bool pause = false; 
+        public List<Tuple> pausedRows = new List<Tuple>();
         public Task SubmitTuples(Tuple row) {
+            if(pause)
+            {
+                pausedRows.Add(row);
+                return Task.CompletedTask;
+            }
 
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(500);
-            Console.WriteLine("Scan operator received the temperature");
+            Console.WriteLine("Filter operator received the tuple with id " + row.id);
 
             if(row.followers == 34)
             {
@@ -25,6 +32,29 @@ namespace TexeraOrleansPrototype
             {
                 return Task.CompletedTask;
             }
+        }
+
+        public Task PauseOperator()
+        {
+            pause = true;
+            return Task.CompletedTask;
+        }
+
+        public Task ResumeOperator()
+        {
+            pause = false;
+            
+            if(pausedRows.Count > 0)
+            {
+                foreach(Tuple row in pausedRows)
+                {
+                    SubmitTuples(row);
+                }
+
+                pausedRows.Clear();
+            }
+
+            return Task.CompletedTask;
         }
     }
 }
