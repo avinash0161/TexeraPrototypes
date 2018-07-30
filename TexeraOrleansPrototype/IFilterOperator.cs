@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TexeraOrleansPrototype
 {
-    public interface IScanOperator : IGrainWithIntegerKey
+    public interface IFilterOperator : IGrainWithIntegerKey
     {
         Task SubmitTuples(Tuple row);
     }

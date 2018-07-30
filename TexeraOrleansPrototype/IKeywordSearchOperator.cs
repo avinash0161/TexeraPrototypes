@@ -10,6 +10,6 @@ namespace TexeraOrleansPrototype
     {
         Task<Guid> GetStreamGuid();
 
-        Task SubmitTuples(float temperature);
+        Task SubmitTuples(Tuple row);
     }
 }

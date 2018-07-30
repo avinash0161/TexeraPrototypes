@@ -15,14 +15,19 @@ namespace TexeraOrleansPrototype
         {
             return Task.FromResult(guid);
         }
-        public Task SubmitTuples(float temperature) {
+        public Task SubmitTuples(Tuple row) {
             Console.WriteLine("Keyword operator received the temperature");
             var streamProvider = GetStreamProvider("SMSProvider");
             //Get the reference to a stream
             // Console.WriteLine("Keyword side guid is " + guid);
-            var stream = streamProvider.GetStream<float>(guid, "Random");
+            var stream = streamProvider.GetStream<Tuple>(guid, "Random");
             // await stream.OnNextAsync(temperature);
-            stream.OnNextAsync(temperature);
+
+            if(row.text.Contains("rains"))
+            {
+                stream.OnNextAsync(row);
+            }       
+
             return Task.CompletedTask;
             // return;
         }

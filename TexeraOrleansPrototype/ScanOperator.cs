@@ -9,11 +9,11 @@ namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
-        public Task SubmitTuples(float temperature) {
+        public Task SubmitTuples(Tuple row) {
 
-            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(500);
+            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(500);
             Console.WriteLine("Scan operator received the temperature");
-            Task x = nextOperator.SubmitTuples(temperature);
+            Task x = nextOperator.SubmitTuples(row);
             // await x;
             return x;
             // return;

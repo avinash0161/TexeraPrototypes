@@ -4,6 +4,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
 using System.Net;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,12 +47,18 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
+                    List<Tuple> rows = new List<Tuple>();
+                    rows.Add(new Tuple(1, "when it rains it pours", 34));
+                    rows.Add(new Tuple(2, "the rains it raineth everyday", 4));
+                    rows.Add(new Tuple(3, "if the aim is total abject embarrassment", 34));
+                    rows.Add(new Tuple(4, "a star winked at me btwn the apricot", 34));
+                    rows.Add(new Tuple(5, "it rains and pours", 34));
+
                     Guid streamGuid = await client.GetGrain<IKeywordSearchOperator>(500).GetStreamGuid();
 
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
-                    .GetStream<float>(streamGuid, "Random");
-                    // await stream.SubscribeAsync(async (data, token) => Console.WriteLine(data));
+                    .GetStream<Tuple>(streamGuid, "Random");
 
                     await stream.SubscribeAsync(new StreamObserver());
 
@@ -60,10 +67,15 @@ namespace TexeraOrleansPrototype
                         Console.WriteLine("Client giving another request");
                         
                         var sensor = client.GetGrain<IScanOperator>(500);
-                        Task t = sensor.SubmitTuples((float)5.78);
+
+                        foreach(Tuple row in rows)
+                        {
+                            Task t = sensor.SubmitTuples(row);
+                        }
+                        
                         // await t;
                         // Console.WriteLine("Client Task Status - "+t.Status);
-                        Thread.Sleep(1000);
+                        Thread.Sleep(10000);
                     }
                 }
             }
