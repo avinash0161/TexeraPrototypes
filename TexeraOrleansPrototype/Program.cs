@@ -47,14 +47,7 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
-                    List<Tuple> rows = new List<Tuple>();
-                    rows.Add(new Tuple(1, "when it rains it pours", 34));
-                    rows.Add(new Tuple(2, "the rains it raineth everyday", 34));
-                    rows.Add(new Tuple(3, "if the aim is total abject embarrassment", 34));
-                    rows.Add(new Tuple(4, "a star winked at me btwn the apricot", 34));
-                    rows.Add(new Tuple(5, "it rains and pours", 34));
-
-                    Guid streamGuid = await client.GetGrain<IKeywordSearchOperator>(500).GetStreamGuid();
+                    Guid streamGuid = await client.GetGrain<IKeywordSearchOperator>(0).GetStreamGuid();
 
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
@@ -64,23 +57,31 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
+                    int count = 0;
                     while (true)
                     {
                         Console.WriteLine("Client giving another request");
-                        
-                        var sensor = client.GetGrain<IScanOperator>(500);
 
+                        List<IScanOperator> operators=new List<IScanOperator>();
+                   
+                        for(int i=0;i<5;++i)
+                            operators.Add(client.GetGrain<IScanOperator>(i+1));
                         // sensor.SubmitTuples(rows);
-
-                        foreach(Tuple row in rows)
+                        string line;
+                        for (int i = 0; i < 5; ++i)
                         {
-                            Task t = sensor.SubmitTuples(new List<Tuple>(){row});
+                            if ((line = file.ReadLine()) != null)
+                            {
+                                operators[i].SubmitTuples(new List<Tuple>{ new Tuple(count,line.Split(","))});
+                                count++;
+                            }
                             Thread.Sleep(1000);
                         }
-                        
+
                         // await t;
                         // Console.WriteLine("Client Task Status - "+t.Status);
-                        Thread.Sleep(30000);
+                        Thread.Sleep(5000);
                         Console.WriteLine("--------------------------");
                     }
                 }

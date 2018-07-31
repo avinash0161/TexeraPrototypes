@@ -18,10 +18,10 @@ namespace TexeraOrleansPrototype
                 return Task.CompletedTask;
             }
 
-            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(500);
+            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
             Console.WriteLine("Filter operator received the tuple with id " + row.id);
 
-            if(row.followers == 34)
+            if(row.unit_cost > 50)
             {
                 Task x = nextOperator.SubmitTuples(row);
                 // await x;

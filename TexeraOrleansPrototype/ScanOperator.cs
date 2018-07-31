@@ -19,7 +19,8 @@ namespace TexeraOrleansPrototype
                 return Task.CompletedTask;
             }
 
-            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(500);
+
+            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
             Console.WriteLine("Scan operator received the tuples");
 
             foreach(Tuple row in rows)

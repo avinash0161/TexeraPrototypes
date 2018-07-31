@@ -31,7 +31,7 @@ namespace TexeraOrleansPrototype
             var stream = streamProvider.GetStream<Tuple>(guid, "Random");
             // await stream.OnNextAsync(temperature);
 
-            if(row.text.Contains("rains"))
+            if(row.region.Contains("China"))
             {
                 stream.OnNextAsync(row);
             }       
