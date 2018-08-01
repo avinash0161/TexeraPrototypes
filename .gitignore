@@ -9,6 +9,7 @@ user-resources/
 bin/
 obj/
 OrleansAdoNetContent/
+large_Input.csv
 
 
 # Ignoring IntelliJ related files

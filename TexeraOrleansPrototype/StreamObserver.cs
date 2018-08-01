@@ -8,7 +8,7 @@ using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
-    public class StreamObserver : IAsyncObserver<Tuple>
+    public class StreamObserver : IAsyncObserver<int>
     {
         // private ILogger logger;
         // public StreamObserver(ILogger logger)
@@ -28,9 +28,9 @@ namespace TexeraOrleansPrototype
             return Task.CompletedTask;
         }
 
-        public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
+        public Task OnNextAsync(int item, StreamSequenceToken token = null)
         {
-            Console.WriteLine($"=={item.id}== received: by client");
+            Console.WriteLine($"=={item}== count received: by client");
             return Task.CompletedTask;
         }
     }

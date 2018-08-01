@@ -25,19 +25,15 @@ namespace TexeraOrleansPrototype
             }
             
             Console.WriteLine("Keyword operator received the tuple with id " + row.id);
-            var streamProvider = GetStreamProvider("SMSProvider");
-            //Get the reference to a stream
-            // Console.WriteLine("Keyword side guid is " + guid);
-            var stream = streamProvider.GetStream<Tuple>(guid, "Random");
-            // await stream.OnNextAsync(temperature);
 
             if(row.region.Contains("China"))
             {
-                stream.OnNextAsync(row);
-            }       
-
-            return Task.CompletedTask;
-            // return;
+                ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(500);
+                nextOperator.SetAggregatorLevel(true);
+                nextOperator.SubmitTuples(row);
+            }
+            
+            return Task.CompletedTask;     
         }
 
         public Task PauseOperator()

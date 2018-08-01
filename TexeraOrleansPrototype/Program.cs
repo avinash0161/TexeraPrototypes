@@ -47,17 +47,17 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
-                    Guid streamGuid = await client.GetGrain<IKeywordSearchOperator>(0).GetStreamGuid();
+                    Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
 
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
-                    .GetStream<Tuple>(streamGuid, "Random");
+                    .GetStream<int>(streamGuid, "Random");
 
                     await stream.SubscribeAsync(new StreamObserver());
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"large_Input.csv");
                     int count = 0;
                     while (true)
                     {
