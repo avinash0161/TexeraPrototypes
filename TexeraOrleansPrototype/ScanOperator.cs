@@ -9,7 +9,7 @@ namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
-        public bool pause = false; 
+        public bool pause = false;
         public List<Tuple> pausedRows = new List<Tuple>();
         public Task SubmitTuples(List<Tuple> rows) 
         {
@@ -25,7 +25,6 @@ namespace TexeraOrleansPrototype
 
             foreach(Tuple row in rows)
             {
-
                 Console.WriteLine("Scan operator sending next tuple with id "+ row.id);
                 nextOperator.SubmitTuples(row);
                 // Thread.Sleep(2000);

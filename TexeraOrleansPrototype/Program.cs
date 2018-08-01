@@ -69,16 +69,17 @@ namespace TexeraOrleansPrototype
                         // sensor.SubmitTuples(rows);
                         string line;
                         for (int i = 0; i <num_scan; ++i)
-                        {
+                        { 
                             if ((line = file.ReadLine()) != null)
                             {
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
                                 count++;
+                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
+                                
                             }
                             else
                             {
-                                operators[i].QuitOperator();
                                 count = -1;
+                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, null) });
                             }
                             Thread.Sleep(100);
                         }
@@ -87,9 +88,9 @@ namespace TexeraOrleansPrototype
                         // Console.WriteLine("Client Task Status - "+t.Status);
                         Thread.Sleep(100);
                         Console.WriteLine("--------------------------");
-                        if (count == -1)
-                            break;
+                        if (count == -1) break;
                     }
+                    Console.ReadLine();
                 }
             }
         }

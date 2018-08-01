@@ -10,7 +10,7 @@ namespace TexeraOrleansPrototype
     public class CountOperator : Grain, ICountOperator
     {
         private Guid guid = Guid.NewGuid();
-        public bool pause = false; 
+        public bool pause = false;
         public List<Tuple> pausedRows = new List<Tuple>();
         public List<int> pausedIntermediateAgg = new List<int>();
         public bool isIntermediate = false;
@@ -54,8 +54,15 @@ namespace TexeraOrleansPrototype
                 pausedRows.Add(row);
                 return Task.CompletedTask;
             }
-
-            count++;
+            Console.WriteLine("Count operator received the tuple with id " + row.id);
+            if (row.id==-1)
+            {
+                ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
+                finalAggregator.SetAggregatorLevel(false);
+                finalAggregator.SubmitIntermediateAgg(count);
+            }
+            else
+                count++;
 
             return Task.CompletedTask;
         }

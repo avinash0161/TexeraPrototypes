@@ -10,7 +10,7 @@ namespace TexeraOrleansPrototype
     public class KeywordSearchOperator : Grain, IKeywordSearchOperator
     {
         private Guid guid = Guid.NewGuid();
-        public bool pause = false; 
+        public bool pause = false;
         public List<Tuple> pausedRows = new List<Tuple>();
         public Task<Guid> GetStreamGuid()
         {
@@ -25,10 +25,10 @@ namespace TexeraOrleansPrototype
             }
             
             Console.WriteLine("Keyword operator received the tuple with id " + row.id);
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            nextOperator.SetAggregatorLevel(true);
-            if (row.region.Contains("Asia"))
+            if (row.id==-1 || row.region.Contains("Asia"))
             {
+                ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+                nextOperator.SetAggregatorLevel(true);
                 nextOperator.SubmitTuples(row);
             }
             

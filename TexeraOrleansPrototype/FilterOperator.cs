@@ -9,7 +9,7 @@ namespace TexeraOrleansPrototype
 {
     public class FilterOperator : Grain, IFilterOperator
     {
-        public bool pause = false; 
+        public bool pause = false;
         public List<Tuple> pausedRows = new List<Tuple>();
         public Task SubmitTuples(Tuple row) {
             if(pause)
@@ -21,7 +21,7 @@ namespace TexeraOrleansPrototype
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
             Console.WriteLine("Filter operator received the tuple with id " + row.id);
 
-            if(row.unit_cost > 50)
+            if(row.id == -1 || row.unit_cost > 50)
             {
                 Task x = nextOperator.SubmitTuples(row);
                 // await x;
