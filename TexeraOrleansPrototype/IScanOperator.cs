@@ -11,5 +11,6 @@ namespace TexeraOrleansPrototype
         Task SubmitTuples(List<Tuple> row);
         Task PauseOperator();
         Task ResumeOperator();
+        Task QuitOperator();
     }
 }

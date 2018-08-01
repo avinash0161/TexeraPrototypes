@@ -24,6 +24,8 @@ namespace TexeraOrleansPrototype {
         public Tuple(int id,string[] list) 
         {
             this.id = id;
+            if (list == null)
+                return;
             region = list[0];
             units_sold = int.Parse(list[8]);
             unit_price = float.Parse(list[9]);

@@ -14,5 +14,6 @@ namespace TexeraOrleansPrototype
         Task SubmitIntermediateAgg(int aggregation);
         Task PauseOperator();
         Task ResumeOperator();
+        Task QuitOperator();
     }
 }

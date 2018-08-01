@@ -55,17 +55,7 @@ namespace TexeraOrleansPrototype
                 return Task.CompletedTask;
             }
 
-            if(row.id == -1)
-            {
-                    ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
-                    finalAggregator.SetAggregatorLevel(false);
-
-                    finalAggregator.SubmitIntermediateAgg(count);
-            }
-            else
-            {
-                count++;
-            }
+            count++;
 
             return Task.CompletedTask;
         }
@@ -100,6 +90,17 @@ namespace TexeraOrleansPrototype
                 pausedIntermediateAgg.Clear();
             }
 
+            return Task.CompletedTask;
+        }
+
+        public Task QuitOperator()
+        {
+            if (isIntermediate)
+            {
+                ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
+                finalAggregator.SetAggregatorLevel(false);
+                finalAggregator.SubmitIntermediateAgg(count);
+            }
             return Task.CompletedTask;
         }
     }

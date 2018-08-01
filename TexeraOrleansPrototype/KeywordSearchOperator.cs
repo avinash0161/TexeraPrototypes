@@ -25,11 +25,10 @@ namespace TexeraOrleansPrototype
             }
             
             Console.WriteLine("Keyword operator received the tuple with id " + row.id);
-
-            if(row.region.Contains("China"))
+            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            nextOperator.SetAggregatorLevel(true);
+            if (row.region.Contains("Asia"))
             {
-                ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(500);
-                nextOperator.SetAggregatorLevel(true);
                 nextOperator.SubmitTuples(row);
             }
             
@@ -39,6 +38,8 @@ namespace TexeraOrleansPrototype
         public Task PauseOperator()
         {
             pause = true;
+            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            nextOperator.PauseOperator();
             return Task.CompletedTask;
         }
 
@@ -54,7 +55,15 @@ namespace TexeraOrleansPrototype
                 }
                 pausedRows.Clear();
             }
+            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            nextOperator.ResumeOperator();
 
+            return Task.CompletedTask;
+        }
+        public Task QuitOperator()
+        {
+            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            nextOperator.QuitOperator();
             return Task.CompletedTask;
         }
     }

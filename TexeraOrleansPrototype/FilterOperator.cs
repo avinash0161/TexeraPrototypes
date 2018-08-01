@@ -37,6 +37,8 @@ namespace TexeraOrleansPrototype
         public Task PauseOperator()
         {
             pause = true;
+            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
+            nextOperator.PauseOperator();
             return Task.CompletedTask;
         }
 
@@ -54,7 +56,17 @@ namespace TexeraOrleansPrototype
                 pausedRows.Clear();
             }
 
+            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
+            nextOperator.ResumeOperator();
             return Task.CompletedTask;
         }
+
+        public Task QuitOperator()
+        {
+            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
+            nextOperator.QuitOperator();
+            return Task.CompletedTask;
+        }
+
     }
 }

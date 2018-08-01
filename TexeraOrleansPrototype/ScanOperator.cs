@@ -41,6 +41,8 @@ namespace TexeraOrleansPrototype
         public Task PauseOperator()
         {
             pause = true;
+            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            nextOperator.PauseOperator();
             return Task.CompletedTask;
         }
 
@@ -53,7 +55,14 @@ namespace TexeraOrleansPrototype
                 SubmitTuples(pausedRows);
                 pausedRows.Clear();
             }
-
+            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            nextOperator.ResumeOperator();
+            return Task.CompletedTask;
+        }
+        public Task QuitOperator()
+        {
+            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            nextOperator.QuitOperator();
             return Task.CompletedTask;
         }
     }

@@ -12,6 +12,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
+        private static int num_scan = 10;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -57,32 +58,37 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"large_Input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
                     int count = 0;
+                    List<IScanOperator> operators = new List<IScanOperator>();
+                    for (int i = 0; i < num_scan; ++i)
+                        operators.Add(client.GetGrain<IScanOperator>(i + 2));
                     while (true)
                     {
                         Console.WriteLine("Client giving another request");
-
-                        List<IScanOperator> operators=new List<IScanOperator>();
-                   
-                        for(int i=0;i<5;++i)
-                            operators.Add(client.GetGrain<IScanOperator>(i+1));
                         // sensor.SubmitTuples(rows);
                         string line;
-                        for (int i = 0; i < 5; ++i)
+                        for (int i = 0; i <num_scan; ++i)
                         {
                             if ((line = file.ReadLine()) != null)
                             {
-                                operators[i].SubmitTuples(new List<Tuple>{ new Tuple(count,line.Split(","))});
+                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
                                 count++;
                             }
-                            Thread.Sleep(1000);
+                            else
+                            {
+                                operators[i].QuitOperator();
+                                count = -1;
+                            }
+                            Thread.Sleep(100);
                         }
 
                         // await t;
                         // Console.WriteLine("Client Task Status - "+t.Status);
-                        Thread.Sleep(5000);
+                        Thread.Sleep(100);
                         Console.WriteLine("--------------------------");
+                        if (count == -1)
+                            break;
                     }
                 }
             }
@@ -96,24 +102,14 @@ namespace TexeraOrleansPrototype
                 if (input == 'p')
                 {
                     // Console.WriteLine("Pause Called");
-                    IScanOperator  scan = client.GetGrain<IScanOperator>(500);
-                    IFilterOperator filter = client.GetGrain<IFilterOperator>(500);
-                    IKeywordSearchOperator keyword = client.GetGrain<IKeywordSearchOperator>(500);
-                    
-                    scan.PauseOperator();
-                    filter.PauseOperator();
-                    keyword.PauseOperator();
+                    for (int i = 0; i < num_scan; ++i)
+                        client.GetGrain<IScanOperator>(i + 2).PauseOperator();
                 }
                 else if (input == 'r')
                 {
                     // Console.WriteLine("Resume Called");
-                    IScanOperator  scan = client.GetGrain<IScanOperator>(500);
-                    IFilterOperator filter = client.GetGrain<IFilterOperator>(500);
-                    IKeywordSearchOperator keyword = client.GetGrain<IKeywordSearchOperator>(500);
-                    
-                    scan.ResumeOperator();
-                    filter.ResumeOperator();
-                    keyword.ResumeOperator();
+                    for (int i = 0; i < num_scan; ++i)
+                        client.GetGrain<IScanOperator>(i + 2).ResumeOperator();
                 }
             }
         }
