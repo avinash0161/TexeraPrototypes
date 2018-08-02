@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace TexeraOrleansPrototype
 {
@@ -11,38 +12,51 @@ namespace TexeraOrleansPrototype
     {
         public bool pause = false;
         public List<Tuple> pausedRows = new List<Tuple>();
-        public Task SubmitTuples(Tuple row) {
+        public FileStream fs;
+        public StreamWriter sw;
+
+        public override Task OnActivateAsync()
+        {
+            string path = "Filter_" + this.GetPrimaryKeyLong().ToString();
+            fs = new FileStream(path, FileMode.Create);
+            sw = new StreamWriter(fs);
+            return base.OnActivateAsync();
+        }
+        public override Task OnDeactivateAsync()
+        {
+            sw.Flush();
+            fs.Close();
+            return base.OnDeactivateAsync();
+        }
+        public async Task SubmitTuples(Tuple row) {
             if(pause)
             {
                 pausedRows.Add(row);
-                return Task.CompletedTask;
+                //return Task.CompletedTask;
             }
 
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            Console.WriteLine("Filter operator received the tuple with id " + row.id);
-
-            if(row.id == -1 || row.unit_cost > 50)
+            //Console.WriteLine("Filter operator received the tuple with id " + row.id);
+            // if (row.id == -1 || row.unit_cost > 50)
+            if (row.id != -1)
+                sw.WriteLine(row.id);
+            if(true)
             {
-                Task x = nextOperator.SubmitTuples(row);
+                nextOperator.SubmitTuples(row);
                 // await x;
-                return x;
+                //return x;
                 // return;
-            }
-            else
-            {
-                return Task.CompletedTask;
             }
         }
 
-        public Task PauseOperator()
+        public async Task PauseOperator()
         {
             pause = true;
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            nextOperator.PauseOperator();
-            return Task.CompletedTask;
+            await nextOperator.PauseOperator();
         }
 
-        public Task ResumeOperator()
+        public async Task ResumeOperator()
         {
             pause = false;
             
@@ -50,22 +64,22 @@ namespace TexeraOrleansPrototype
             {
                 foreach(Tuple row in pausedRows)
                 {
-                    SubmitTuples(row);
+                    await SubmitTuples(row);
                 }
 
                 pausedRows.Clear();
             }
 
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            nextOperator.ResumeOperator();
-            return Task.CompletedTask;
+            await nextOperator.ResumeOperator();
         }
 
-        public Task QuitOperator()
+        public async Task QuitOperator()
         {
+            sw.Flush();
+            fs.Close();
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            nextOperator.QuitOperator();
-            return Task.CompletedTask;
+            await nextOperator.QuitOperator();
         }
 
     }

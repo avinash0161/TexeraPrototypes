@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.IO;
 namespace TexeraOrleansPrototype
 {
     public class CountOperator : Grain, ICountOperator
@@ -16,6 +16,24 @@ namespace TexeraOrleansPrototype
         public bool isIntermediate = false;
         public int count = 0;
         public int intermediateAggregatorsResponded = 0;
+
+        public FileStream fs;
+        public StreamWriter sw;
+
+        public override Task OnActivateAsync()
+        {
+            string path = "Count_" + this.GetPrimaryKeyLong().ToString();
+            fs = new FileStream(path, FileMode.Create);
+            sw = new StreamWriter(fs);
+            return base.OnActivateAsync();
+        }
+        public override Task OnDeactivateAsync()
+        {
+            sw.Flush();
+            fs.Close();
+            return base.OnDeactivateAsync();
+        }
+
 
         public Task SetAggregatorLevel(bool isIntermediate)
         {
@@ -48,14 +66,16 @@ namespace TexeraOrleansPrototype
             return Task.CompletedTask;
         }
 
-        public Task SubmitTuples(Tuple row) {
+        public async Task SubmitTuples(Tuple row) {
             if(pause)
             {
                 pausedRows.Add(row);
-                return Task.CompletedTask;
+                //return Task.CompletedTask;
             }
-            Console.WriteLine("Count operator received the tuple with id " + row.id);
-            if (row.id==-1)
+            //Console.WriteLine("Count operator received the tuple with id " + row.id);
+            if (row.id != -1)
+                sw.WriteLine(row.id);
+            if (row.id == -1)
             {
                 ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
                 finalAggregator.SetAggregatorLevel(false);
@@ -64,16 +84,16 @@ namespace TexeraOrleansPrototype
             else
                 count++;
 
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
-        public Task PauseOperator()
+        public async Task PauseOperator()
         {
             pause = true;
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
-        public Task ResumeOperator()
+        public async Task ResumeOperator()
         {
             pause = false;
             
@@ -81,7 +101,7 @@ namespace TexeraOrleansPrototype
             {
                 foreach(Tuple row in pausedRows)
                 {
-                    SubmitTuples(row);
+                    await SubmitTuples(row);
                 }
 
                 pausedRows.Clear();
@@ -97,18 +117,21 @@ namespace TexeraOrleansPrototype
                 pausedIntermediateAgg.Clear();
             }
 
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
-        public Task QuitOperator()
+        public async Task QuitOperator()
         {
+            sw.Flush();
+            fs.Close();
             if (isIntermediate)
             {
+
                 ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
                 finalAggregator.SetAggregatorLevel(false);
                 finalAggregator.SubmitIntermediateAgg(count);
             }
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
     }
 }
