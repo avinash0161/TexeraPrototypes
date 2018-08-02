@@ -59,7 +59,7 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\median_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"median_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<IScanOperator> operators = new List<IScanOperator>();

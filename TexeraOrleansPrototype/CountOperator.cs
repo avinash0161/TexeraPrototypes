@@ -73,13 +73,13 @@ namespace TexeraOrleansPrototype
                 //return Task.CompletedTask;
             }
             //Console.WriteLine("Count operator received the tuple with id " + row.id);
-            if (row.id != -1)
-                sw.WriteLine(row.id);
+            // if (row.id != -1)
+            //     sw.WriteLine(row.id);
             if (row.id == -1)
             {
                 ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
-                finalAggregator.SetAggregatorLevel(false);
-                finalAggregator.SubmitIntermediateAgg(count);
+                await finalAggregator.SetAggregatorLevel(false);
+                await finalAggregator.SubmitIntermediateAgg(count);
             }
             else
                 count++;

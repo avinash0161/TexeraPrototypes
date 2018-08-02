@@ -14,12 +14,14 @@ namespace TexeraOrleansPrototype
         public List<Tuple> pausedRows = new List<Tuple>();
         public FileStream fs;
         public StreamWriter sw;
+        public IKeywordSearchOperator nextOperator;
 
         public override Task OnActivateAsync()
         {
             string path = "Filter_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
+            nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync()
@@ -35,14 +37,14 @@ namespace TexeraOrleansPrototype
                 //return Task.CompletedTask;
             }
 
-            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
+            // IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
             //Console.WriteLine("Filter operator received the tuple with id " + row.id);
             // if (row.id == -1 || row.unit_cost > 50)
-            if (row.id != -1)
-                sw.WriteLine(row.id);
+            // if (row.id != -1)
+            //     sw.WriteLine(row.id);
             if(true)
             {
-                nextOperator.SubmitTuples(row);
+                await nextOperator.SubmitTuples(row);
                 // await x;
                 //return x;
                 // return;

@@ -15,11 +15,14 @@ namespace TexeraOrleansPrototype
         public FileStream fs;
         public StreamWriter sw;
 
+        public IFilterOperator nextOperator;
+
         public override Task OnActivateAsync()
         {
             string path = "Scan_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
+            nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync()
@@ -38,15 +41,15 @@ namespace TexeraOrleansPrototype
             }
 
 
-            IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            // IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
             //Console.WriteLine("Scan operator received the tuples");
 
             foreach(Tuple row in rows)
             {
                 //Console.WriteLine("Scan operator sending next tuple with id "+ row.id);
-                if (row.id != -1)
-                    sw.WriteLine(row.id);
-                nextOperator.SubmitTuples(row);
+                // if (row.id != -1)
+                //     sw.WriteLine(row.id);
+                await nextOperator.SubmitTuples(row);
                 // Thread.Sleep(2000);
             }
 

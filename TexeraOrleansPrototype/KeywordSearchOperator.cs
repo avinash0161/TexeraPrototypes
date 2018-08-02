@@ -16,12 +16,14 @@ namespace TexeraOrleansPrototype
 
         public FileStream fs;
         public StreamWriter sw;
+        ICountOperator nextOperator;
 
         public override Task OnActivateAsync()
         {
             string path = "KeywordSearch_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
+            nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync()
@@ -45,13 +47,13 @@ namespace TexeraOrleansPrototype
 
             //Console.WriteLine("Keyword operator received the tuple with id " + row.id);
             // if (row.id==-1 || row.region.Contains("Asia"))
-            if (row.id != -1)
-                sw.WriteLine(row.id);
+            // if (row.id != -1)
+            //     sw.WriteLine(row.id);
             if (true)
             {
-                ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-                nextOperator.SetAggregatorLevel(true);
-                nextOperator.SubmitTuples(row);
+                // ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+                await nextOperator.SetAggregatorLevel(true);
+                await nextOperator.SubmitTuples(row);
             }
             
             //return Task.CompletedTask;     
