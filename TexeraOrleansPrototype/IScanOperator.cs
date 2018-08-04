@@ -8,7 +8,7 @@ namespace TexeraOrleansPrototype
 {
     public interface IScanOperator : IGrainWithIntegerKey
     {
-        Task SubmitTuples(List<Tuple> row);
+        Task SubmitTuples(List<Tuple> row,bool isLeft);
         Task PauseOperator();
         Task ResumeOperator();
         Task QuitOperator();

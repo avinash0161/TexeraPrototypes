@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace TexeraOrleansPrototype
 {
-    public interface ICountOperator : IGrainWithIntegerKey
-    {
-        Task SetAggregatorLevel(bool isIntermediate);
+    public interface IJoinOperator : IGrainWithIntegerKey
+    { 
         Task<Guid> GetStreamGuid();
-        Task SubmitTuples(Tuple row);
-        Task SubmitIntermediateAgg(int aggregation);
+        Task SubmitTuples(Tuple row,bool isLeft);
         Task PauseOperator();
         Task ResumeOperator();
         Task QuitOperator();

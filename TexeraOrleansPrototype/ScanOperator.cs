@@ -15,14 +15,14 @@ namespace TexeraOrleansPrototype
         public FileStream fs;
         public StreamWriter sw;
 
-        public IFilterOperator nextOperator;
+        public IJoinOperator nextOperator;
 
         public override Task OnActivateAsync()
         {
             string path = "Scan_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
-            nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            nextOperator = base.GrainFactory.GetGrain<IJoinOperator>(1);
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync()
@@ -32,7 +32,7 @@ namespace TexeraOrleansPrototype
             return base.OnDeactivateAsync();
         }
 
-        public async Task SubmitTuples(List<Tuple> rows) 
+        public async Task SubmitTuples(List<Tuple> rows,bool isLeft) 
         {
             if(pause)
             {
@@ -46,10 +46,10 @@ namespace TexeraOrleansPrototype
 
             foreach(Tuple row in rows)
             {
-                //Console.WriteLine("Scan operator sending next tuple with id "+ row.id);
                 // if (row.id != -1)
                 //     sw.WriteLine(row.id);
-                await nextOperator.SubmitTuples(row);
+                Console.WriteLine("sending row with id " + row.id);
+                await nextOperator.SubmitTuples(row,isLeft);
                 // Thread.Sleep(2000);
             }
 
@@ -74,7 +74,7 @@ namespace TexeraOrleansPrototype
             
             if(pausedRows.Count > 0)
             {
-                await SubmitTuples(pausedRows);
+                await SubmitTuples(pausedRows,true);
                 pausedRows.Clear();
             }
             IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());

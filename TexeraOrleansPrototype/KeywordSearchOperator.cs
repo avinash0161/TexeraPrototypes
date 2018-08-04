@@ -16,14 +16,14 @@ namespace TexeraOrleansPrototype
 
         public FileStream fs;
         public StreamWriter sw;
-        ICountOperator nextOperator;
+        //ICountOperator nextOperator;
 
         public override Task OnActivateAsync()
         {
             string path = "KeywordSearch_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
-            nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            //nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync()
@@ -45,25 +45,24 @@ namespace TexeraOrleansPrototype
                 //return Task.CompletedTask;
             }
 
-            //Console.WriteLine("Keyword operator received the tuple with id " + row.id);
+            
             // if (row.id==-1 || row.region.Contains("Asia"))
             // if (row.id != -1)
             //     sw.WriteLine(row.id);
             if (true)
             {
                 // ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-                await nextOperator.SetAggregatorLevel(true);
-                await nextOperator.SubmitTuples(row);
+                //await nextOperator.SetAggregatorLevel(true);
+                //await nextOperator.SubmitTuples(row);
             }
-            
+            //Console.WriteLine("Keyword operator received the tuple with id " + row.id);
             //return Task.CompletedTask;     
         }
 
         public async Task PauseOperator()
         {
             pause = true;
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.PauseOperator();
+            //await nextOperator.PauseOperator();
             //return Task.CompletedTask;
         }
 
@@ -79,8 +78,8 @@ namespace TexeraOrleansPrototype
                 }
                 pausedRows.Clear();
             }
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.ResumeOperator();
+            //ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            //await nextOperator.ResumeOperator();
 
             //return Task.CompletedTask;
         }
@@ -88,8 +87,8 @@ namespace TexeraOrleansPrototype
         {
             sw.Flush();
             fs.Close();
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.QuitOperator();
+            //ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            //await nextOperator.QuitOperator();
             //return Task.CompletedTask;
         }
     }

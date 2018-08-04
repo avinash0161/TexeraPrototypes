@@ -38,7 +38,7 @@ namespace TexeraOrleansPrototype
             }
 
             // IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            //Console.WriteLine("Filter operator received the tuple with id " + row.id);
+          
             // if (row.id == -1 || row.unit_cost > 50)
             // if (row.id != -1)
             //     sw.WriteLine(row.id);
@@ -49,6 +49,7 @@ namespace TexeraOrleansPrototype
                 //return x;
                 // return;
             }
+            //Console.WriteLine("Filter operator received the tuple with id " + row.id);
         }
 
         public async Task PauseOperator()

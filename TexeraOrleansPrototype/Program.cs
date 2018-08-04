@@ -13,7 +13,8 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 10;
+        private static int num_scan1 = 10;
+        private static int num_scan2 = 10;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -49,7 +50,7 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
-                    Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
+                    Guid streamGuid = await client.GetGrain<IJoinOperator>(1).GetStreamGuid();
 
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
@@ -59,39 +60,62 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"median_input.csv");
+                    System.IO.StreamReader file1 = new System.IO.StreamReader(@"d:\small_input.csv");
+                    System.IO.StreamReader file2 = new System.IO.StreamReader(@"d:\small_input.csv");
                     int count = 0;
-                    bool need_break = false;
-                    List<IScanOperator> operators = new List<IScanOperator>();
-                    for (int i = 0; i < num_scan; ++i)
-                        operators.Add(client.GetGrain<IScanOperator>(i + 2));
+                    bool need_break1 = false;
+                    bool need_break2 = false;
+                    List<IScanOperator> operators1 = new List<IScanOperator>();
+                    for (int i = 0; i < num_scan1; ++i)
+                        operators1.Add(client.GetGrain<IScanOperator>(i + 2));
+                    List<IScanOperator> operators2 = new List<IScanOperator>();
+                    for (int i = 0; i < num_scan2; ++i)
+                        operators2.Add(client.GetGrain<IScanOperator>(i + 12));
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     while (true)
                     {
-                        //Console.WriteLine("Client giving another request");
-                        // sensor.SubmitTuples(rows);
                         string line;
-                        for (int i = 0; i <num_scan; ++i)
-                        { 
-                            if ((line = file.ReadLine()) != null)
+                        for (int i = 0; i < num_scan1; ++i)
+                        {
+                            if ((line = file1.ReadLine()) != null)
                             {
-                                await operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
+                                await operators1[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) },true);
                                 count++;
                             }
                             else
-                                need_break = true;
-                            // Thread.Sleep(100);
+                            {
+                                need_break1 = true;
+                                break;
+                            }
                         }
-
-                        // await t;
-                        // Console.WriteLine("Client Task Status - "+t.Status);
-                        // Thread.Sleep(100);
-                        //Console.WriteLine("--------------------------");
-                        if (need_break)
+                        if (need_break1)
                         {
-                            for (int i = 0; i < num_scan; ++i)
-                                await operators[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) });
+                            for (int i = 0; i < num_scan1; ++i)
+                                await operators1[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) },true);
+                            break;
+                        }
+                    }
+                    while (true)
+                    {
+                        string line;
+                        for (int i = 0; i < num_scan2; ++i)
+                        {
+                            if ((line = file2.ReadLine()) != null)
+                            {
+                                await operators2[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) },false);
+                                count++;
+                            }
+                            else
+                            {
+                                need_break2 = true;
+                                break;
+                            }
+                        }
+                        if (need_break2)
+                        {
+                            for (int i = 0; i < num_scan2; ++i)
+                                await operators2[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) },false);
                             break;
                         }
                     }
@@ -99,9 +123,12 @@ namespace TexeraOrleansPrototype
                     Console.WriteLine("Time usage: " + sw.Elapsed);
                     Console.WriteLine(count + "rows sent");
                     Console.ReadLine();
+                    /*
                     Console.WriteLine("Flushing the buffer and closing the filestreams...");
-                    for (int i = 0; i < num_scan; ++i)
-                        await client.GetGrain<IScanOperator>(i + 2).QuitOperator();
+                    for (int i = 0; i < num_scan1; ++i)
+                        await operators1[i].QuitOperator();
+                    for (int i = 0; i < num_scan2; ++i)
+                        await operators2[i].QuitOperator();
                     Console.WriteLine("Complete!");
                     Console.ReadLine();
                     Console.WriteLine("Opening and merging...");
@@ -111,6 +138,7 @@ namespace TexeraOrleansPrototype
                     Console.WriteLine("Report: Count operator missed " + ReportMissing("Count_", count) + " row(s)");
                     Console.WriteLine("Complete!");
                     Console.ReadLine();
+                    */
                     
                 }
             }
@@ -124,13 +152,13 @@ namespace TexeraOrleansPrototype
                 if (input == 'p')
                 {
                     // Console.WriteLine("Pause Called");
-                    for (int i = 0; i < num_scan; ++i)
+                    for (int i = 0; i < num_scan1; ++i)
                         client.GetGrain<IScanOperator>(i + 2).PauseOperator();
                 }
                 else if (input == 'r')
                 {
                     // Console.WriteLine("Resume Called");
-                    for (int i = 0; i < num_scan; ++i)
+                    for (int i = 0; i < num_scan1; ++i)
                         client.GetGrain<IScanOperator>(i + 2).ResumeOperator();
                 }
             }
@@ -140,7 +168,7 @@ namespace TexeraOrleansPrototype
         {
             int res = 0;
             bool[] l = new bool[count];
-            for (int i = 2; i < num_scan+2; ++i)
+            for (int i = 2; i < num_scan1+2; ++i)
             {
                 System.IO.StreamReader file = new System.IO.StreamReader(prefix+i.ToString());
                 string line;
