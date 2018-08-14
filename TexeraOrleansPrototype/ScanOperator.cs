@@ -49,7 +49,7 @@ namespace TexeraOrleansPrototype
                 //Console.WriteLine("Scan operator sending next tuple with id "+ row.id);
                 // if (row.id != -1)
                 //     sw.WriteLine(row.id);
-                await nextOperator.SubmitTuples(row);
+                nextOperator.SubmitTuples(row);
                 // Thread.Sleep(2000);
             }
 

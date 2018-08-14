@@ -52,8 +52,8 @@ namespace TexeraOrleansPrototype
             if (true)
             {
                 // ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-                await nextOperator.SetAggregatorLevel(true);
-                await nextOperator.SubmitTuples(row);
+                nextOperator.SetAggregatorLevel(true);
+                nextOperator.SubmitTuples(row);
             }
             
             //return Task.CompletedTask;     
@@ -63,7 +63,7 @@ namespace TexeraOrleansPrototype
         {
             pause = true;
             ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.PauseOperator();
+            nextOperator.PauseOperator();
             //return Task.CompletedTask;
         }
 
@@ -80,7 +80,7 @@ namespace TexeraOrleansPrototype
                 pausedRows.Clear();
             }
             ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.ResumeOperator();
+            nextOperator.ResumeOperator();
 
             //return Task.CompletedTask;
         }
@@ -89,7 +89,7 @@ namespace TexeraOrleansPrototype
             sw.Flush();
             fs.Close();
             ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.QuitOperator();
+            nextOperator.QuitOperator();
             //return Task.CompletedTask;
         }
     }

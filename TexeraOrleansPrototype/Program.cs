@@ -59,39 +59,38 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"median_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<IScanOperator> operators = new List<IScanOperator>();
                     for (int i = 0; i < num_scan; ++i)
+                    {
                         operators.Add(client.GetGrain<IScanOperator>(i + 2));
+                        client.GetGrain<IFilterOperator>(i + 2).GetGrainIdentity();
+                        client.GetGrain<IKeywordSearchOperator>(i + 2).GetGrainIdentity();
+                        client.GetGrain<ICountOperator>(i + 2).GetGrainIdentity();
+                    }
+                    Thread.Sleep(1000);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     while (true)
                     {
-                        //Console.WriteLine("Client giving another request");
-                        // sensor.SubmitTuples(rows);
                         string line;
                         for (int i = 0; i <num_scan; ++i)
                         { 
                             if ((line = file.ReadLine()) != null)
                             {
-                                await operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
+                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
                                 count++;
                             }
                             else
                                 need_break = true;
-                            // Thread.Sleep(100);
                         }
 
-                        // await t;
-                        // Console.WriteLine("Client Task Status - "+t.Status);
-                        // Thread.Sleep(100);
-                        //Console.WriteLine("--------------------------");
                         if (need_break)
                         {
                             for (int i = 0; i < num_scan; ++i)
-                                await operators[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) });
+                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) });
                             break;
                         }
                     }

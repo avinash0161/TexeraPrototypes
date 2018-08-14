@@ -44,7 +44,7 @@ namespace TexeraOrleansPrototype
             //     sw.WriteLine(row.id);
             if(true)
             {
-                await nextOperator.SubmitTuples(row);
+                nextOperator.SubmitTuples(row);
                 // await x;
                 //return x;
                 // return;
@@ -55,7 +55,7 @@ namespace TexeraOrleansPrototype
         {
             pause = true;
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.PauseOperator();
+            nextOperator.PauseOperator();
         }
 
         public async Task ResumeOperator()
@@ -73,7 +73,7 @@ namespace TexeraOrleansPrototype
             }
 
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.ResumeOperator();
+            nextOperator.ResumeOperator();
         }
 
         public async Task QuitOperator()
@@ -81,7 +81,7 @@ namespace TexeraOrleansPrototype
             sw.Flush();
             fs.Close();
             IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            await nextOperator.QuitOperator();
+            nextOperator.QuitOperator();
         }
 
     }

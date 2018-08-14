@@ -78,8 +78,8 @@ namespace TexeraOrleansPrototype
             if (row.id == -1)
             {
                 ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
-                await finalAggregator.SetAggregatorLevel(false);
-                await finalAggregator.SubmitIntermediateAgg(count);
+                finalAggregator.SetAggregatorLevel(false);
+                finalAggregator.SubmitIntermediateAgg(count);
             }
             else
                 count++;
