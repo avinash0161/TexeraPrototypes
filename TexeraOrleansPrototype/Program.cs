@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 10;
+        private static int num_scan = 1;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -49,28 +49,32 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
-                    Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
-
-                    Console.WriteLine("Client side guid is " + streamGuid);
-                    var stream = client.GetStreamProvider("SMSProvider")
-                    .GetStream<int>(streamGuid, "Random");
+                    var streamProvider = client.GetStreamProvider("SMSProvider");
+                    var stream = streamProvider.GetStream<int>(Guid.Empty, "Random");
 
                     await stream.SubscribeAsync(new StreamObserver());
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
                     int count = 0;
                     bool need_break = false;
-                    List<IScanOperator> operators = new List<IScanOperator>();
+                    List<Orleans.Streams.IAsyncStream<List<Tuple>>> operators = new List<Orleans.Streams.IAsyncStream<List<Tuple>>>();
                     for (int i = 0; i < num_scan; ++i)
                     {
-                        operators.Add(client.GetGrain<IScanOperator>(i + 2));
-                        client.GetGrain<IFilterOperator>(i + 2).GetGrainIdentity();
-                        client.GetGrain<IKeywordSearchOperator>(i + 2).GetGrainIdentity();
-                        client.GetGrain<ICountOperator>(i + 2).GetGrainIdentity();
+
+                        var guid = client.GetGrain<IScanOperator>(i + 2).GetPrimaryKey();
+                        var s = streamProvider.GetStream<List<Tuple>>(guid, "Scan");
+                        s.SubscribeAsync(client.GetGrain<IScanOperator>(i + 2));
+                        operators.Add(s);
+                        client.GetGrain<IScanOperator>(i + 2).OutTo("Filter");
+                        client.GetGrain<IFilterOperator>(i + 2).OutTo("KeywordSearch");
+                        client.GetGrain<IKeywordSearchOperator>(i + 2).OutTo("Count");
+                        client.GetGrain<ICountOperator>(i + 2).OutTo("CountFinal");
                     }
-                    Thread.Sleep(1000);
+
+                    client.GetGrain<ICountFinalOperator>(1).OutTo("Random");
+                    Thread.Sleep(5000);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     while (true)
@@ -80,7 +84,7 @@ namespace TexeraOrleansPrototype
                         { 
                             if ((line = file.ReadLine()) != null)
                             {
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
+                                await operators[i].OnNextAsync(new List<Tuple> { new Tuple(count, line.Split(",")) });
                                 count++;
                             }
                             else
@@ -90,7 +94,7 @@ namespace TexeraOrleansPrototype
                         if (need_break)
                         {
                             for (int i = 0; i < num_scan; ++i)
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) });
+                                await operators[i].OnCompletedAsync();
                             break;
                         }
                     }
@@ -98,9 +102,6 @@ namespace TexeraOrleansPrototype
                     Console.WriteLine("Time usage: " + sw.Elapsed);
                     Console.WriteLine(count + "rows sent");
                     Console.ReadLine();
-                    Console.WriteLine("Flushing the buffer and closing the filestreams...");
-                    for (int i = 0; i < num_scan; ++i)
-                        await client.GetGrain<IScanOperator>(i + 2).QuitOperator();
                     Console.WriteLine("Complete!");
                     Console.ReadLine();
                     Console.WriteLine("Opening and merging...");
@@ -123,14 +124,12 @@ namespace TexeraOrleansPrototype
                 if (input == 'p')
                 {
                     // Console.WriteLine("Pause Called");
-                    for (int i = 0; i < num_scan; ++i)
-                        client.GetGrain<IScanOperator>(i + 2).PauseOperator();
+                    
                 }
                 else if (input == 'r')
                 {
                     // Console.WriteLine("Resume Called");
-                    for (int i = 0; i < num_scan; ++i)
-                        client.GetGrain<IScanOperator>(i + 2).ResumeOperator();
+                    
                 }
             }
         }

@@ -5,27 +5,42 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
     public class KeywordSearchOperator : Grain, IKeywordSearchOperator
     {
-        private Guid guid = Guid.NewGuid();
-        public bool pause = false;
-        public List<Tuple> pausedRows = new List<Tuple>();
 
         public FileStream fs;
         public StreamWriter sw;
-        ICountOperator nextOperator;
+        public Orleans.Streams.IAsyncStream<Tuple> in_stream;
+        public Orleans.Streams.IAsyncStream<Tuple> out_stream;
 
-        public override Task OnActivateAsync()
+        public Task OutTo(string operator_name)
+        {
+            var streamProvider = GetStreamProvider("SMSProvider");
+            out_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), operator_name);
+            return Task.CompletedTask;
+        }
+
+        public async override Task OnActivateAsync()
         {
             string path = "KeywordSearch_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
-            nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            return base.OnActivateAsync();
+            var streamProvider = GetStreamProvider("SMSProvider");
+            in_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), "KeywordSearch");
+            await in_stream.SubscribeAsync(this);
+            await base.OnActivateAsync();
         }
+
+        public Task OnCompletedAsync()
+        {
+            out_stream.OnCompletedAsync();
+            return Task.CompletedTask;
+        }
+
         public override Task OnDeactivateAsync()
         {
             sw.Flush();
@@ -33,64 +48,16 @@ namespace TexeraOrleansPrototype
             return base.OnDeactivateAsync();
         }
 
-        public Task<Guid> GetStreamGuid()
+        public Task OnErrorAsync(Exception ex)
         {
-            return Task.FromResult(guid);
-        }
-        public async Task SubmitTuples(Tuple row) {
-            // Thread.Sleep(3000);
-            if(pause)
-            {
-                pausedRows.Add(row);
-                //return Task.CompletedTask;
-            }
-
-            //Console.WriteLine("Keyword operator received the tuple with id " + row.id);
-            // if (row.id==-1 || row.region.Contains("Asia"))
-            // if (row.id != -1)
-            //     sw.WriteLine(row.id);
-            if (true)
-            {
-                // ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-                nextOperator.SetAggregatorLevel(true);
-                nextOperator.SubmitTuples(row);
-            }
-            
-            //return Task.CompletedTask;     
+            throw new NotImplementedException();
         }
 
-        public async Task PauseOperator()
+        public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
-            pause = true;
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            nextOperator.PauseOperator();
-            //return Task.CompletedTask;
-        }
-
-        public async Task ResumeOperator()
-        {
-            pause = false;
-            
-            if(pausedRows.Count > 0)
-            {
-                foreach(Tuple row in pausedRows)
-                {
-                    await SubmitTuples(row);
-                }
-                pausedRows.Clear();
-            }
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            nextOperator.ResumeOperator();
-
-            //return Task.CompletedTask;
-        }
-        public async Task QuitOperator()
-        {
-            sw.Flush();
-            fs.Close();
-            ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
-            nextOperator.QuitOperator();
-            //return Task.CompletedTask;
+            if (item.region.Contains("Asia"))
+                out_stream.OnNextAsync(item);
+            return Task.CompletedTask;
         }
     }
 }

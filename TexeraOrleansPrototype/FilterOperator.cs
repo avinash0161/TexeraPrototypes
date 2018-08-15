@@ -5,84 +5,61 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
     public class FilterOperator : Grain, IFilterOperator
     {
-        public bool pause = false;
-        public List<Tuple> pausedRows = new List<Tuple>();
         public FileStream fs;
         public StreamWriter sw;
-        public IKeywordSearchOperator nextOperator;
+        public Orleans.Streams.IAsyncStream<Tuple> in_stream;
+        public Orleans.Streams.IAsyncStream<Tuple> out_stream;
 
-        public override Task OnActivateAsync()
+        public Task OutTo(string operator_name)
+        {
+            var streamProvider = GetStreamProvider("SMSProvider");
+            out_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(),operator_name);
+            return Task.CompletedTask;
+        }
+
+        public async override Task OnActivateAsync()
         {
             string path = "Filter_" + this.GetPrimaryKeyLong().ToString();
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
-            nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            return base.OnActivateAsync();
+            var streamProvider = GetStreamProvider("SMSProvider");
+            in_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), "Filter");
+            await in_stream.SubscribeAsync(this);
+            await base.OnActivateAsync();
+            Console.WriteLine("Filter: init");
         }
+
+        public Task OnCompletedAsync()
+        {
+            Console.WriteLine("Filter: END");
+            out_stream.OnCompletedAsync();
+            return Task.CompletedTask;
+        }
+
         public override Task OnDeactivateAsync()
         {
             sw.Flush();
             fs.Close();
             return base.OnDeactivateAsync();
         }
-        public async Task SubmitTuples(Tuple row) {
-            if(pause)
-            {
-                pausedRows.Add(row);
-                //return Task.CompletedTask;
-            }
 
-            // IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            //Console.WriteLine("Filter operator received the tuple with id " + row.id);
-            // if (row.id == -1 || row.unit_cost > 50)
-            // if (row.id != -1)
-            //     sw.WriteLine(row.id);
-            if(true)
-            {
-                nextOperator.SubmitTuples(row);
-                // await x;
-                //return x;
-                // return;
-            }
-        }
-
-        public async Task PauseOperator()
+        public Task OnErrorAsync(Exception ex)
         {
-            pause = true;
-            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            nextOperator.PauseOperator();
+            throw new NotImplementedException();
         }
 
-        public async Task ResumeOperator()
+        public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
-            pause = false;
-            
-            if(pausedRows.Count > 0)
-            {
-                foreach(Tuple row in pausedRows)
-                {
-                    await SubmitTuples(row);
-                }
-
-                pausedRows.Clear();
-            }
-
-            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            nextOperator.ResumeOperator();
+            Console.WriteLine("Filter: " + item.id);
+            if (item.unit_cost > 50)
+                out_stream.OnNextAsync(item);
+            return Task.CompletedTask;
         }
-
-        public async Task QuitOperator()
-        {
-            sw.Flush();
-            fs.Close();
-            IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            nextOperator.QuitOperator();
-        }
-
     }
 }

@@ -1,22 +1,21 @@
-using Orleans;
+﻿using Orleans;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
 using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
-    public class CountOperator : Grain, ICountOperator
+    class CountFinalOperator : Grain, ICountFinalOperator
     {
-        public FileStream fs;
-        public StreamWriter sw;
-        private int count = 0;
-        public Orleans.Streams.IAsyncStream<Tuple> in_stream;
+        public Orleans.Streams.IAsyncStream<int> in_stream;
         public Orleans.Streams.IAsyncStream<int> out_stream;
 
+        private int count = 0;
+        private int complete_count = 0;
+
+        public string output_operator;
 
         public Task OutTo(string operator_name)
         {
@@ -28,11 +27,8 @@ namespace TexeraOrleansPrototype
 
         public async override Task OnActivateAsync()
         {
-            string path = "Count_" + this.GetPrimaryKeyLong().ToString();
-            fs = new FileStream(path, FileMode.Create);
-            sw = new StreamWriter(fs);
             var streamProvider = GetStreamProvider("SMSProvider");
-            in_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), "Count");
+            in_stream = streamProvider.GetStream<int>(Guid.Empty, "CountFinal");
             await in_stream.SubscribeAsync(this);
             await base.OnActivateAsync();
         }
@@ -40,16 +36,10 @@ namespace TexeraOrleansPrototype
 
         public Task OnCompletedAsync()
         {
-            out_stream.OnNextAsync(count);
-            out_stream.OnCompletedAsync();
+            complete_count++;
+            if (complete_count == 1)
+                out_stream.OnNextAsync(count);
             return Task.CompletedTask;
-        }
-
-        public override Task OnDeactivateAsync()
-        {
-            sw.Flush();
-            fs.Close();
-            return base.OnDeactivateAsync();
         }
 
         public Task OnErrorAsync(Exception ex)
@@ -57,9 +47,9 @@ namespace TexeraOrleansPrototype
             throw new NotImplementedException();
         }
 
-        public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
+        public Task OnNextAsync(int item, StreamSequenceToken token = null)
         {
-            count++;
+            count += item;
             return Task.CompletedTask;
         }
     }

@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
-    public interface IScanOperator : IGrainWithIntegerKey
+    public interface IScanOperator : IGrainWithIntegerKey, IAsyncObserver<List<Tuple>>
     {
-        Task SubmitTuples(List<Tuple> row);
-        Task PauseOperator();
-        Task ResumeOperator();
-        Task QuitOperator();
+        Task OutTo(string operator_name);
     }
 }

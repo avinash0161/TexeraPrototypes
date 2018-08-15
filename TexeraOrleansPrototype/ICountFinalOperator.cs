@@ -1,4 +1,4 @@
-using Orleans;
+﻿using Orleans;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +7,7 @@ using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
-    public interface IFilterOperator : IGrainWithIntegerKey, IAsyncObserver<Tuple>
+    interface ICountFinalOperator: IGrainWithIntegerKey, IAsyncObserver<int>
     {
         Task OutTo(string operator_name);
     }
