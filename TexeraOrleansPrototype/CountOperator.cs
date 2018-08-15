@@ -33,7 +33,10 @@ namespace TexeraOrleansPrototype
             fs.Close();
             return base.OnDeactivateAsync();
         }
-
+        public Task WakeUp()
+        {
+            return Task.CompletedTask;
+        }
 
         public Task SetAggregatorLevel(bool isIntermediate)
         {
@@ -57,7 +60,7 @@ namespace TexeraOrleansPrototype
             count += aggregation;
             intermediateAggregatorsResponded++;
 
-            if(intermediateAggregatorsResponded == 10)
+            if(intermediateAggregatorsResponded == 1)
             {
                 var streamProvider = GetStreamProvider("SMSProvider");
                 var stream = streamProvider.GetStream<int>(guid, "Random");

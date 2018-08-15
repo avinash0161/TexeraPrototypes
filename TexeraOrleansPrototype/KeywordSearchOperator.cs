@@ -17,7 +17,10 @@ namespace TexeraOrleansPrototype
         public FileStream fs;
         public StreamWriter sw;
         ICountOperator nextOperator;
-
+        public Task WakeUp()
+        {
+            return Task.CompletedTask;
+        }
         public override Task OnActivateAsync()
         {
             string path = "KeywordSearch_" + this.GetPrimaryKeyLong().ToString();

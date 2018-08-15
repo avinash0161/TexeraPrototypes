@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 10;
+        private static int num_scan = 1;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -59,16 +59,18 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<IScanOperator> operators = new List<IScanOperator>();
                     for (int i = 0; i < num_scan; ++i)
                     {
-                        operators.Add(client.GetGrain<IScanOperator>(i + 2));
-                        client.GetGrain<IFilterOperator>(i + 2).GetGrainIdentity();
-                        client.GetGrain<IKeywordSearchOperator>(i + 2).GetGrainIdentity();
-                        client.GetGrain<ICountOperator>(i + 2).GetGrainIdentity();
+                        var t = client.GetGrain<IScanOperator>(i + 2);
+                        t.WakeUp();
+                        operators.Add(t);
+                        client.GetGrain<IFilterOperator>(i + 2).WakeUp();
+                        client.GetGrain<IKeywordSearchOperator>(i + 2).WakeUp();
+                        client.GetGrain<ICountOperator>(i + 2).WakeUp();
                     }
                     Thread.Sleep(1000);
                     Stopwatch sw = new Stopwatch();

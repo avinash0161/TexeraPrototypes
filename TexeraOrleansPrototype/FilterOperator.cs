@@ -16,6 +16,12 @@ namespace TexeraOrleansPrototype
         public StreamWriter sw;
         public IKeywordSearchOperator nextOperator;
 
+        public Task WakeUp()
+        {
+            return Task.CompletedTask;
+        }
+
+
         public override Task OnActivateAsync()
         {
             string path = "Filter_" + this.GetPrimaryKeyLong().ToString();
@@ -36,13 +42,13 @@ namespace TexeraOrleansPrototype
                 pausedRows.Add(row);
                 //return Task.CompletedTask;
             }
-
+            Console.WriteLine("Filter: " + row.id);
             // IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
             //Console.WriteLine("Filter operator received the tuple with id " + row.id);
             // if (row.id == -1 || row.unit_cost > 50)
             // if (row.id != -1)
             //     sw.WriteLine(row.id);
-            if(true)
+            if (true)
             {
                 nextOperator.SubmitTuples(row);
                 // await x;

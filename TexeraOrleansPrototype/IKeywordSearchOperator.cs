@@ -14,5 +14,6 @@ namespace TexeraOrleansPrototype
         Task PauseOperator();
         Task ResumeOperator();
         Task QuitOperator();
+        Task WakeUp();
     }
 }

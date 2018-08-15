@@ -17,6 +17,12 @@ namespace TexeraOrleansPrototype
 
         public IFilterOperator nextOperator;
 
+        public Task WakeUp()
+        {
+            return Task.CompletedTask;
+        }
+
+
         public override Task OnActivateAsync()
         {
             string path = "Scan_" + this.GetPrimaryKeyLong().ToString();
@@ -46,7 +52,7 @@ namespace TexeraOrleansPrototype
 
             foreach(Tuple row in rows)
             {
-                //Console.WriteLine("Scan operator sending next tuple with id "+ row.id);
+                Console.WriteLine("Scan: "+ row.id);
                 // if (row.id != -1)
                 //     sw.WriteLine(row.id);
                 nextOperator.SubmitTuples(row);
