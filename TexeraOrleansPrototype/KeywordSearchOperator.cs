@@ -55,7 +55,7 @@ namespace TexeraOrleansPrototype
 
         public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
-            if (item.region.Contains("Asia"))
+            if (item.id == -1|| item.region.Contains("Asia"))
                 out_stream.OnNextAsync(item);
             return Task.CompletedTask;
         }

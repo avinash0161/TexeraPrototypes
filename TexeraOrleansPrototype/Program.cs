@@ -54,6 +54,9 @@ namespace TexeraOrleansPrototype
 
                     await stream.SubscribeAsync(new StreamObserver());
 
+                    //for (int i = 0; i < 1; ++i)
+                    //    await stream.OnNextAsync(i);
+
                     Task.Run(() => AcceptInputForPauseResume(client));
 
                     System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
@@ -72,9 +75,8 @@ namespace TexeraOrleansPrototype
                         client.GetGrain<IKeywordSearchOperator>(i + 2).OutTo("Count");
                         client.GetGrain<ICountOperator>(i + 2).OutTo("CountFinal");
                     }
-
                     client.GetGrain<ICountFinalOperator>(1).OutTo("Random");
-                    Thread.Sleep(5000);
+                    Thread.Sleep(1000);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     while (true)
@@ -84,7 +86,10 @@ namespace TexeraOrleansPrototype
                         { 
                             if ((line = file.ReadLine()) != null)
                             {
-                                await operators[i].OnNextAsync(new List<Tuple> { new Tuple(count, line.Split(",")) });
+                                if(count==0)
+                                    await operators[i].OnNextAsync(new List<Tuple> { new Tuple(count, line.Split(",")) });
+                                else
+                                    operators[i].OnNextAsync(new List<Tuple> { new Tuple(count, line.Split(",")) });
                                 count++;
                             }
                             else
@@ -94,7 +99,8 @@ namespace TexeraOrleansPrototype
                         if (need_break)
                         {
                             for (int i = 0; i < num_scan; ++i)
-                                await operators[i].OnCompletedAsync();
+                                //operators[i].OnCompletedAsync();
+                                operators[i].OnNextAsync(new List<Tuple> { new Tuple(-1, null) });
                             break;
                         }
                     }

@@ -60,6 +60,10 @@ namespace TexeraOrleansPrototype
         public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
             count++;
+            if(item.id==-1)
+            {
+                out_stream.OnNextAsync(count);
+            }
             return Task.CompletedTask;
         }
     }

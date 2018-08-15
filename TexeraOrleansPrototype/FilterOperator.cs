@@ -57,7 +57,7 @@ namespace TexeraOrleansPrototype
         public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
             Console.WriteLine("Filter: " + item.id);
-            if (item.unit_cost > 50)
+            if (item.id == -1||item.unit_cost > 50)
                 out_stream.OnNextAsync(item);
             return Task.CompletedTask;
         }

@@ -50,6 +50,9 @@ namespace TexeraOrleansPrototype
         public Task OnNextAsync(int item, StreamSequenceToken token = null)
         {
             count += item;
+            complete_count++;
+            if (complete_count == 1)
+                out_stream.OnNextAsync(count);
             return Task.CompletedTask;
         }
     }
