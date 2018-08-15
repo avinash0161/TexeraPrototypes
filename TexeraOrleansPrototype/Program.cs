@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 1;
+        private static int num_scan = 10;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -59,7 +59,7 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\median_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<Orleans.Streams.IAsyncStream<List<Tuple>>> operators = new List<Orleans.Streams.IAsyncStream<List<Tuple>>>();
@@ -99,8 +99,8 @@ namespace TexeraOrleansPrototype
                         if (need_break)
                         {
                             for (int i = 0; i < num_scan; ++i)
-                                //operators[i].OnCompletedAsync();
-                                operators[i].OnNextAsync(new List<Tuple> { new Tuple(-1, null) });
+                                operators[i].OnCompletedAsync();
+                                //operators[i].OnNextAsync(new List<Tuple> { new Tuple(-1, null) });
                             break;
                         }
                     }

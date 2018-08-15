@@ -62,7 +62,7 @@ namespace TexeraOrleansPrototype
         {
             foreach(var i in item)
             {
-                Console.WriteLine("Scan: " + i.id);
+                //Console.WriteLine("Scan: " + i.id);
                 out_stream.OnNextAsync(i);
             }
             return Task.CompletedTask;
