@@ -52,6 +52,8 @@ namespace TexeraOrleansPrototype
             // if (row.id==-1 || row.region.Contains("Asia"))
             // if (row.id != -1)
             //     sw.WriteLine(row.id);
+            if (row.id == -1)
+                Console.WriteLine("KeywordSearch done");
             if (true)
             {
                 // ICountOperator nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());

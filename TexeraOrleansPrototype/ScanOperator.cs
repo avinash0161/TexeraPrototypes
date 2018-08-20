@@ -16,6 +16,7 @@ namespace TexeraOrleansPrototype
         public StreamWriter sw;
 
         public IFilterOperator nextOperator;
+        System.IO.StreamReader file;
 
         public Task WakeUp()
         {
@@ -29,6 +30,9 @@ namespace TexeraOrleansPrototype
             fs = new FileStream(path, FileMode.Create);
             sw = new StreamWriter(fs);
             nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            string p2 = @"d:\small_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
+            Console.WriteLine(p2);
+            file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync()
@@ -46,18 +50,18 @@ namespace TexeraOrleansPrototype
                 //return Task.CompletedTask;
             }
 
-
+            string line;
+            int count = 0;
             // IFilterOperator nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
             //Console.WriteLine("Scan operator received the tuples");
-
-            foreach(Tuple row in rows)
+            while ((line = file.ReadLine()) != null)
             {
-                Console.WriteLine("Scan: "+ row.id);
-                // if (row.id != -1)
-                //     sw.WriteLine(row.id);
-                nextOperator.SubmitTuples(row);
-                // Thread.Sleep(2000);
+                nextOperator.SubmitTuples(new Tuple(count, line.Split(",")));
+                count++;
             }
+            nextOperator.SubmitTuples(new Tuple(-1, null));
+
+            Console.WriteLine("Scan "+ this.GetPrimaryKeyLong().ToString() + " done");
 
             //return Task.CompletedTask;
             // Task x = nextOperator.SubmitTuples(row);

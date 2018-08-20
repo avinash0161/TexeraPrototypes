@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 1;
+        private static int num_scan = 10;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -54,63 +54,28 @@ namespace TexeraOrleansPrototype
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
                     .GetStream<int>(streamGuid, "Random");
-
-                    await stream.SubscribeAsync(new StreamObserver());
+                    var so = new StreamObserver();
+                    await stream.SubscribeAsync(so);
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
-                    int count = 0;
-                    bool need_break = false;
+                    
                     List<IScanOperator> operators = new List<IScanOperator>();
                     for (int i = 0; i < num_scan; ++i)
                     {
                         var t = client.GetGrain<IScanOperator>(i + 2);
-                        t.WakeUp();
+                        await t.WakeUp();
                         operators.Add(t);
-                        client.GetGrain<IFilterOperator>(i + 2).WakeUp();
-                        client.GetGrain<IKeywordSearchOperator>(i + 2).WakeUp();
-                        client.GetGrain<ICountOperator>(i + 2).WakeUp();
+                        await client.GetGrain<IFilterOperator>(i + 2).WakeUp();
+                        await client.GetGrain<IKeywordSearchOperator>(i + 2).WakeUp();
+                        await client.GetGrain<ICountOperator>(i + 2).WakeUp();
                     }
                     Thread.Sleep(1000);
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
-                    while (true)
-                    {
-                        string line;
-                        for (int i = 0; i <num_scan; ++i)
-                        { 
-                            if ((line = file.ReadLine()) != null)
-                            {
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
-                                count++;
-                            }
-                            else
-                                need_break = true;
-                        }
-
-                        if (need_break)
-                        {
-                            for (int i = 0; i < num_scan; ++i)
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) });
-                            break;
-                        }
-                    }
-                    sw.Stop();
-                    Console.WriteLine("Time usage: " + sw.Elapsed);
-                    Console.WriteLine(count + "rows sent");
-                    Console.ReadLine();
-                    Console.WriteLine("Flushing the buffer and closing the filestreams...");
+                    await so.Start();
                     for (int i = 0; i < num_scan; ++i)
-                        await client.GetGrain<IScanOperator>(i + 2).QuitOperator();
-                    Console.WriteLine("Complete!");
-                    Console.ReadLine();
-                    Console.WriteLine("Opening and merging...");
-                    Console.WriteLine("Report: Scan operator missed "+ReportMissing("Scan_",count)+" row(s)");
-                    Console.WriteLine("Report: Filter operator missed " + ReportMissing("Filter_", count) + " row(s)");
-                    Console.WriteLine("Report: Keyword operator missed " + ReportMissing("KeywordSearch_", count) + " row(s)");
-                    Console.WriteLine("Report: Count operator missed " + ReportMissing("Count_", count) + " row(s)");
-                    Console.WriteLine("Complete!");
+                    {
+                        operators[i].SubmitTuples(null);
+                    }
                     Console.ReadLine();
                     
                 }
