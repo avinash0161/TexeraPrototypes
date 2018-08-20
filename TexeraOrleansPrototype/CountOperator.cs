@@ -60,7 +60,7 @@ namespace TexeraOrleansPrototype
             count += aggregation;
             intermediateAggregatorsResponded++;
 
-            if(intermediateAggregatorsResponded == 1)
+            if(intermediateAggregatorsResponded == 10)
             {
                 var streamProvider = GetStreamProvider("SMSProvider");
                 var stream = streamProvider.GetStream<int>(guid, "Random");
