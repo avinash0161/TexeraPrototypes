@@ -15,8 +15,6 @@ namespace TexeraOrleansPrototype
         private int count = 0;
         private int complete_count = 0;
 
-        public string output_operator;
-
         public Task OutTo(string operator_name)
         {
             var streamProvider = GetStreamProvider("SMSProvider");
@@ -37,7 +35,7 @@ namespace TexeraOrleansPrototype
         public Task OnCompletedAsync()
         {
             complete_count++;
-            if (complete_count == 10)
+            if (complete_count == 1)
                 out_stream.OnNextAsync(count);
             return Task.CompletedTask;
         }

@@ -53,12 +53,19 @@ namespace TexeraOrleansPrototype
             throw new NotImplementedException();
         }
 
-        public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
+        public async Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
+            //Console.WriteLine("KeywordSearch: " + item.id);
             var cond = true;// item.region.Contains("Asia");
-            if (item.id == -1|| cond)
-                out_stream.OnNextAsync(item);
-            return Task.CompletedTask;
+            if (item.id == -1 || cond)
+            {
+                if (item.id == 0)
+                    await out_stream.OnNextAsync(item);
+                else
+                    out_stream.OnNextAsync(item);
+
+            }
+            return;
         }
     }
 }

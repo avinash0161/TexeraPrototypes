@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
@@ -52,14 +53,14 @@ namespace TexeraOrleansPrototype
                     var streamProvider = client.GetStreamProvider("SMSProvider");
                     var stream = streamProvider.GetStream<int>(Guid.Empty, "Random");
 
-                    await stream.SubscribeAsync(new StreamObserver());
-
-                    //for (int i = 0; i < 1; ++i)
-                    //    await stream.OnNextAsync(i);
+                    await stream.SubscribeAsync(new StreamObserver(0));
+                    //await stream.OnNextAsync(-1);
+                    //for (int i = 0; i < 10; ++i)
+                    //    stream.OnNextAsync(i);
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\median_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<Orleans.Streams.IAsyncStream<List<Tuple>>> operators = new List<Orleans.Streams.IAsyncStream<List<Tuple>>>();
@@ -68,7 +69,6 @@ namespace TexeraOrleansPrototype
 
                         var guid = client.GetGrain<IScanOperator>(i + 2).GetPrimaryKey();
                         var s = streamProvider.GetStream<List<Tuple>>(guid, "Scan");
-                        s.SubscribeAsync(client.GetGrain<IScanOperator>(i + 2));
                         operators.Add(s);
                         client.GetGrain<IScanOperator>(i + 2).OutTo("Filter");
                         client.GetGrain<IFilterOperator>(i + 2).OutTo("KeywordSearch");
@@ -76,6 +76,7 @@ namespace TexeraOrleansPrototype
                         client.GetGrain<ICountOperator>(i + 2).OutTo("CountFinal");
                     }
                     client.GetGrain<ICountFinalOperator>(1).OutTo("Random");
+
                     Thread.Sleep(1000);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();

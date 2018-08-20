@@ -57,13 +57,18 @@ namespace TexeraOrleansPrototype
             throw new NotImplementedException();
         }
 
-        public Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
+        public async Task OnNextAsync(Tuple item, StreamSequenceToken token = null)
         {
-            if(item.id==-1)
-                out_stream.OnNextAsync(count);
+            if (item.id == -1)
+            {
+                if (item.id == 0)
+                    await out_stream.OnNextAsync(count);
+                else
+                    out_stream.OnNextAsync(count);
+            }
             else
                 count++;
-            return Task.CompletedTask;
+            return;
         }
     }
 }

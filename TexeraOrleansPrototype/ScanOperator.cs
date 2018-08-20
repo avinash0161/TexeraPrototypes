@@ -58,14 +58,17 @@ namespace TexeraOrleansPrototype
             throw new NotImplementedException();
         }
 
-        public Task OnNextAsync(List<Tuple> item, StreamSequenceToken token = null)
+        public async Task OnNextAsync(List<Tuple> item, StreamSequenceToken token = null)
         {
             foreach(var i in item)
             {
                 //Console.WriteLine("Scan: " + i.id);
-                out_stream.OnNextAsync(i);
+                if(i.id==0)
+                    await out_stream.OnNextAsync(i);
+                else
+                    out_stream.OnNextAsync(i);
             }
-            return Task.CompletedTask;
+            return;
         }
     }
 }

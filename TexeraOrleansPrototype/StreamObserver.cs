@@ -11,10 +11,11 @@ namespace TexeraOrleansPrototype
     public class StreamObserver : IAsyncObserver<int>
     {
         // private ILogger logger;
-        // public StreamObserver(ILogger logger)
-        // {
-           // this.logger = logger;
-        // }
+        private int id;
+         public StreamObserver(int id)
+         {
+            this.id = id;
+         }
 
         public Task OnCompletedAsync()
         {
@@ -30,7 +31,7 @@ namespace TexeraOrleansPrototype
 
         public Task OnNextAsync(int item, StreamSequenceToken token = null)
         {
-            Console.WriteLine($"=={item}== count received: by client");
+            Console.WriteLine($"=={item}== count received: by client "+this.id);
             return Task.CompletedTask;
         }
     }
