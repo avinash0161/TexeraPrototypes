@@ -52,7 +52,7 @@ namespace TexeraOrleansPrototype
 
             foreach(Tuple row in rows)
             {
-                Console.WriteLine("Scan: "+ row.id);
+                //Console.WriteLine("Scan: "+ row.id);
                 // if (row.id != -1)
                 //     sw.WriteLine(row.id);
                 nextOperator.SubmitTuples(row);

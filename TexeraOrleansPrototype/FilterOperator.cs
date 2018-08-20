@@ -42,7 +42,7 @@ namespace TexeraOrleansPrototype
                 pausedRows.Add(row);
                 //return Task.CompletedTask;
             }
-            Console.WriteLine("Filter: " + row.id);
+            //Console.WriteLine("Filter: " + row.id);
             // IKeywordSearchOperator nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
             //Console.WriteLine("Filter operator received the tuple with id " + row.id);
             // if (row.id == -1 || row.unit_cost > 50)

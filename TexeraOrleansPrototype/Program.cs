@@ -54,8 +54,8 @@ namespace TexeraOrleansPrototype
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
                     .GetStream<int>(streamGuid, "Random");
-
-                    await stream.SubscribeAsync(new StreamObserver());
+                    var so = new StreamObserver();
+                    await stream.SubscribeAsync(so);
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
@@ -73,8 +73,7 @@ namespace TexeraOrleansPrototype
                         client.GetGrain<ICountOperator>(i + 2).WakeUp();
                     }
                     Thread.Sleep(1000);
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
+                    await so.Start();
                     while (true)
                     {
                         string line;
@@ -96,8 +95,6 @@ namespace TexeraOrleansPrototype
                             break;
                         }
                     }
-                    sw.Stop();
-                    Console.WriteLine("Time usage: " + sw.Elapsed);
                     Console.WriteLine(count + "rows sent");
                     Console.ReadLine();
                     Console.WriteLine("Flushing the buffer and closing the filestreams...");
