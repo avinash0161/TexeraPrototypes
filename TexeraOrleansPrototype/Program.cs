@@ -16,10 +16,15 @@ namespace TexeraOrleansPrototype
         private static int num_scan = 10;
         static async Task Main(string[] args)
         {
+            const string connectionString = "server=texera-test2;uid=root;pwd=;database=orleans;SslMode=none";
             if (args[0] == "c")
             {
                 var siloBuilder = new SiloHostBuilder()
-                .UseLocalhostClustering()
+                 .UseAdoNetClustering(options =>
+                 {
+                     options.ConnectionString = connectionString;
+                     options.Invariant = "MySql.Data.MySqlClient";
+                 })
                 .AddSimpleMessageStreamProvider("SMSProvider")
                 // add storage to store list of subscriptions
                 .AddMemoryGrainStorage("PubSubStore")
@@ -40,7 +45,11 @@ namespace TexeraOrleansPrototype
             else if (args[0] == "s")
             {
                 var clientBuilder = new ClientBuilder()
-                    .UseLocalhostClustering()
+                    .UseAdoNetClustering(options =>
+                    {
+                        options.ConnectionString = connectionString;
+                        options.Invariant = "MySql.Data.MySqlClient";
+                    })
                     .AddSimpleMessageStreamProvider("SMSProvider")
                     .Configure<ClusterOptions>(options =>
                     {
