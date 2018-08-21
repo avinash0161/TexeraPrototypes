@@ -52,8 +52,19 @@ namespace TexeraOrleansPrototype
                     options.ClusterId = "dev";
                     options.ServiceId = "TexeraOrleansPrototype";
                 })
-                .Configure<EndpointOptions>(options =>
-                    options.AdvertisedIPAddress = )
+                .Configure<EndpointOptions>(options=>
+                {
+                    // Port to use for Silo-to-Silo
+                    options.SiloPort = 11111;
+                    // Port to use for the gateway
+                    options.GatewayPort = 30000;
+                    // IP Address to advertise in the cluster
+                    options.AdvertisedIPAddress = IPAddress.Parse("10.142.0.3");
+                    // The socket used for silo-to-silo will bind to this endpoint
+                    options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, 40000);
+                    // The socket used by the gateway will bind to this endpoint
+                    options.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, 50000);
+                })
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole());
                 var host = siloBuilder.Build();
                 await host.StartAsync();
@@ -63,7 +74,7 @@ namespace TexeraOrleansPrototype
             else if (args[0] == "s")
             {
                 var clientBuilder = new ClientBuilder()
-                    .UseStaticClustering(new IPEndPoint[] { GetIPEndPointFromHostName("texera-test2",11111,false) })
+                    .UseStaticClustering(new IPEndPoint[] { GetIPEndPointFromHostName("texera-test2",30000,false) })
                     .AddSimpleMessageStreamProvider("SMSProvider")
                     .Configure<ClusterOptions>(options =>
                     {
