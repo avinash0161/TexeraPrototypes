@@ -14,17 +14,35 @@ namespace TexeraOrleansPrototype
     class Program
     {
         private static int num_scan = 10;
+
+        //https://stackoverflow.com/questions/2101777/creating-an-ipendpoint-from-a-hostname
+        public static IPEndPoint GetIPEndPointFromHostName(string hostName, int port, bool throwIfMoreThanOneIP)
+        {
+            var addresses = System.Net.Dns.GetHostAddresses(hostName);
+            if (addresses.Length == 0)
+            {
+                throw new ArgumentException(
+                    "Unable to retrieve address from specified host name.",
+                    "hostName"
+                );
+            }
+            else if (throwIfMoreThanOneIP && addresses.Length > 1)
+            {
+                throw new ArgumentException(
+                    "There is more that one IP address to the specified host.",
+                    "hostName"
+                );
+            }
+            return new IPEndPoint(addresses[0], port); // Port gets validated here.
+        }
+
         static async Task Main(string[] args)
         {
-            const string connectionString = "server=localhost;uid=root;pwd=;database=orleans;SslMode=none";
+            //const string connectionString = "server=localhost;uid=root;pwd=;database=orleans;SslMode=none";
             if (args[0] == "c")
             {
                 var siloBuilder = new SiloHostBuilder()
-                 .UseAdoNetClustering(options =>
-                 {
-                     options.ConnectionString = connectionString;
-                     options.Invariant = "MySql.Data.MySqlClient";
-                 })
+                .UseDevelopmentClustering(null)
                 .AddSimpleMessageStreamProvider("SMSProvider")
                 // add storage to store list of subscriptions
                 .AddMemoryGrainStorage("PubSubStore")
@@ -35,7 +53,7 @@ namespace TexeraOrleansPrototype
                     options.ServiceId = "TexeraOrleansPrototype";
                 })
                 .Configure<EndpointOptions>(options =>
-                    options.AdvertisedIPAddress = IPAddress.Loopback)
+                    options.AdvertisedIPAddress = )
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole());
                 var host = siloBuilder.Build();
                 await host.StartAsync();
@@ -45,11 +63,7 @@ namespace TexeraOrleansPrototype
             else if (args[0] == "s")
             {
                 var clientBuilder = new ClientBuilder()
-                    .UseAdoNetClustering(options =>
-                    {
-                        options.ConnectionString = connectionString;
-                        options.Invariant = "MySql.Data.MySqlClient";
-                    })
+                    .UseStaticClustering(new IPEndPoint[] { GetIPEndPointFromHostName("texera-test2",11111,false) })
                     .AddSimpleMessageStreamProvider("SMSProvider")
                     .Configure<ClusterOptions>(options =>
                     {
