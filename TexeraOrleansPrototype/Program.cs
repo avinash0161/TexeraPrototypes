@@ -50,7 +50,7 @@ namespace TexeraOrleansPrototype
                 {
                     if (String.IsNullOrEmpty(databaseName))
                         return false;
-                    string connstring = string.Format("Server=localhost; database={0}; UID=root; password=pwd", databaseName);
+                    string connstring = string.Format("Server=localhost; database={0}; UID=root; password=pwd;SslMode=none", databaseName);
                     connection = new MySqlConnection(connstring);
                     connection.Open();
                 }
