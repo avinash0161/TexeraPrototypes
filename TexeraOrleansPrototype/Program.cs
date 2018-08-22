@@ -68,7 +68,7 @@ namespace TexeraOrleansPrototype
                 var so = new StreamObserver();
                 await stream.SubscribeAsync(so);
 
-                System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
+                System.IO.StreamReader file = new System.IO.StreamReader(@"small_input.csv");
                 int count = 0;
                 bool need_break = false;
                 List<IScanOperator> operators = new List<IScanOperator>();
