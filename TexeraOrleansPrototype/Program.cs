@@ -16,9 +16,9 @@ namespace TexeraOrleansPrototype
         private static int num_scan = 10;
         static async Task Main(string[] args)
         {
-            const string connectionString = "server=texera-test2;uid=root;pwd=pwd;database=orleans;SslMode=none";
             if (args[0] == "c")
             {
+                const string connectionString = "server=localhost;uid=root;pwd=pwd;database=orleans;SslMode=none";
                 var siloBuilder = new SiloHostBuilder()
                  .UseAdoNetClustering(options =>
                  {
@@ -43,6 +43,7 @@ namespace TexeraOrleansPrototype
             }
             else if (args[0] == "s")
             {
+                const string connectionString = "server=texera-test2;uid=root;pwd=pwd;database=orleans;SslMode=none";
                 var clientBuilder = new ClientBuilder()
                     .UseAdoNetClustering(options =>
                     {
