@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 1;
+        private static int num_scan = 10;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -43,7 +43,7 @@ namespace TexeraOrleansPrototype
                         options.ClusterId = "dev";
                         options.ServiceId = "TexeraOrleansPrototype";
                     })
-                    .ConfigureLogging(logging => logging.AddConsole());
+                    .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole());
 
                 using (var client = clientBuilder.Build())
                 {
@@ -59,7 +59,7 @@ namespace TexeraOrleansPrototype
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\small_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"median_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<IScanOperator> operators = new List<IScanOperator>();
@@ -72,26 +72,36 @@ namespace TexeraOrleansPrototype
                         client.GetGrain<IKeywordSearchOperator>(i + 2).WakeUp();
                         client.GetGrain<ICountOperator>(i + 2).WakeUp();
                     }
-                    Thread.Sleep(1000);
-                    await so.Start();
-                    while (true)
-                    {
-                        string line;
-                        for (int i = 0; i <num_scan; ++i)
-                        { 
-                            if ((line = file.ReadLine()) != null)
-                            {
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(count, line.Split(",")) });
-                                count++;
-                            }
-                            else
-                                need_break = true;
-                        }
 
-                        if (need_break)
+                    List<Tuple> mem=new List<Tuple>();
+                    string line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        mem.Add(new Tuple(count, line.Split(",")));
+                        count++;
+                    }
+                    
+                    Thread.Sleep(1000);
+                    Console.WriteLine("All rows have been read into mem");
+                    await so.Start();
+                    int j=0;
+                    while(true)
+                    {
+                        for(int i=0;i<num_scan;++i)
                         {
-                            for (int i = 0; i < num_scan; ++i)
-                                operators[i].SubmitTuples(new List<Tuple> { new Tuple(-1, null) });
+                            if(j<mem.Count)
+                                operators[i].SubmitTuples(new List<Tuple>{mem[j]});
+                            else
+                            {
+                                need_break=true;
+                                break;
+                            }
+                            j++;
+                        }
+                        if(need_break)
+                        {
+                            for(int i=0;i<num_scan;++i)
+                                operators[i].SubmitTuples(new List<Tuple>{new Tuple(-1,null)}); 
                             break;
                         }
                     }
