@@ -43,7 +43,7 @@ namespace TexeraOrleansPrototype
             }
             else if (args[0] == "s")
             {
-                const string connectionString = "server=localhost;uid=root;pwd=pwd;database=orleans;SslMode=none";
+                const string connectionString = "server=texera-test2;uid=root;pwd=pwd;database=orleans;SslMode=none";
                 var clientBuilder = new ClientBuilder()
                     .UseAdoNetClustering(options =>
                     {
