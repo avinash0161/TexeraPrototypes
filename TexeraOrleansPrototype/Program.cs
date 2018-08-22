@@ -34,6 +34,7 @@ namespace TexeraOrleansPrototype
                     options.ClusterId = "dev";
                     options.ServiceId = "TexeraOrleansPrototype";
                 })
+                .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000)
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole());
                 var host = siloBuilder.Build();
                 await host.StartAsync();
