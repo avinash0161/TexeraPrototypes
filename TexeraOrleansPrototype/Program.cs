@@ -51,8 +51,8 @@ namespace TexeraOrleansPrototype
 
                     var streamProvider = client.GetStreamProvider("SMSProvider");
                     var stream = streamProvider.GetStream<int>(Guid.Empty, "Random");
-
-                    await stream.SubscribeAsync(new StreamObserver());
+                    var so=new StreamObserver();
+                    await stream.SubscribeAsync(so);
 
                     Task.Run(() => AcceptInputForPauseResume(client));
 
@@ -75,6 +75,7 @@ namespace TexeraOrleansPrototype
                     Thread.Sleep(1000);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
+                    so.Start();
                     while (true)
                     {
                         string line;
