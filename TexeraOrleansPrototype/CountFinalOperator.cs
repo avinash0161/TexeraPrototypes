@@ -39,7 +39,6 @@ namespace TexeraOrleansPrototype
             complete_count++;
             if (complete_count == Program.num_scan)
                 {
-                    Console.WriteLine("???");
                     out_stream.OnNextAsync(count);
                 }
             return Task.CompletedTask;
@@ -52,7 +51,6 @@ namespace TexeraOrleansPrototype
 
         public Task OnNextAsync(int item, StreamSequenceToken token = null)
         {
-            Console.WriteLine(item);
             count += item;
             return Task.CompletedTask;
         }

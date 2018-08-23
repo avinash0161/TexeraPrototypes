@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public static int num_scan = 10;
+        public static int num_scan = 1000;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
