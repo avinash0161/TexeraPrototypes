@@ -11,8 +11,6 @@ namespace TexeraOrleansPrototype
 {
     public class FilterOperator : Grain, IFilterOperator
     {
-        public FileStream fs;
-        public StreamWriter sw;
         public Orleans.Streams.IAsyncStream<Tuple> in_stream;
         public Orleans.Streams.IAsyncStream<Tuple> out_stream;
 
@@ -25,27 +23,22 @@ namespace TexeraOrleansPrototype
 
         public async override Task OnActivateAsync()
         {
-            string path = "Filter_" + this.GetPrimaryKeyLong().ToString();
-            fs = new FileStream(path, FileMode.Create);
-            sw = new StreamWriter(fs);
             var streamProvider = GetStreamProvider("SMSProvider");
             in_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), "Filter");
             await in_stream.SubscribeAsync(this);
             await base.OnActivateAsync();
-            Console.WriteLine("Filter: init");
+            //Console.WriteLine("Filter: init");
         }
 
         public Task OnCompletedAsync()
         {
-            Console.WriteLine("Filter: END");
+            //Console.WriteLine("Filter: END");
             out_stream.OnCompletedAsync();
             return Task.CompletedTask;
         }
 
         public override Task OnDeactivateAsync()
         {
-            sw.Flush();
-            fs.Close();
             return base.OnDeactivateAsync();
         }
 

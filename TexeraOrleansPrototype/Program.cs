@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 10;
+        public static int num_scan = 10;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -54,12 +54,9 @@ namespace TexeraOrleansPrototype
 
                     await stream.SubscribeAsync(new StreamObserver());
 
-                    //for (int i = 0; i < 1; ++i)
-                    //    await stream.OnNextAsync(i);
-
                     Task.Run(() => AcceptInputForPauseResume(client));
 
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"d:\median_input.csv");
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"median_input.csv");
                     int count = 0;
                     bool need_break = false;
                     List<Orleans.Streams.IAsyncStream<List<Tuple>>> operators = new List<Orleans.Streams.IAsyncStream<List<Tuple>>>();
@@ -68,7 +65,6 @@ namespace TexeraOrleansPrototype
 
                         var guid = client.GetGrain<IScanOperator>(i + 2).GetPrimaryKey();
                         var s = streamProvider.GetStream<List<Tuple>>(guid, "Scan");
-                        s.SubscribeAsync(client.GetGrain<IScanOperator>(i + 2));
                         operators.Add(s);
                         client.GetGrain<IScanOperator>(i + 2).OutTo("Filter");
                         client.GetGrain<IFilterOperator>(i + 2).OutTo("KeywordSearch");
@@ -105,8 +101,7 @@ namespace TexeraOrleansPrototype
                         }
                     }
                     sw.Stop();
-                    Console.WriteLine("Time usage: " + sw.Elapsed);
-                    Console.WriteLine(count + "rows sent");
+                    Console.WriteLine(count + "rows sent in "+ sw.Elapsed);
                     Console.ReadLine();
                     Console.WriteLine("Complete!");
                     Console.ReadLine();

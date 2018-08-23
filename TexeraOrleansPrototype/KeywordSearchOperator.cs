@@ -12,8 +12,6 @@ namespace TexeraOrleansPrototype
     public class KeywordSearchOperator : Grain, IKeywordSearchOperator
     {
 
-        public FileStream fs;
-        public StreamWriter sw;
         public Orleans.Streams.IAsyncStream<Tuple> in_stream;
         public Orleans.Streams.IAsyncStream<Tuple> out_stream;
 
@@ -26,9 +24,6 @@ namespace TexeraOrleansPrototype
 
         public async override Task OnActivateAsync()
         {
-            string path = "KeywordSearch_" + this.GetPrimaryKeyLong().ToString();
-            fs = new FileStream(path, FileMode.Create);
-            sw = new StreamWriter(fs);
             var streamProvider = GetStreamProvider("SMSProvider");
             in_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), "KeywordSearch");
             await in_stream.SubscribeAsync(this);
@@ -43,8 +38,6 @@ namespace TexeraOrleansPrototype
 
         public override Task OnDeactivateAsync()
         {
-            sw.Flush();
-            fs.Close();
             return base.OnDeactivateAsync();
         }
 

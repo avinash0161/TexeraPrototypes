@@ -11,8 +11,6 @@ namespace TexeraOrleansPrototype
 {
     public class CountOperator : Grain, ICountOperator
     {
-        public FileStream fs;
-        public StreamWriter sw;
         private int count = 0;
         public Orleans.Streams.IAsyncStream<Tuple> in_stream;
         public Orleans.Streams.IAsyncStream<int> out_stream;
@@ -28,9 +26,6 @@ namespace TexeraOrleansPrototype
 
         public async override Task OnActivateAsync()
         {
-            string path = "Count_" + this.GetPrimaryKeyLong().ToString();
-            fs = new FileStream(path, FileMode.Create);
-            sw = new StreamWriter(fs);
             var streamProvider = GetStreamProvider("SMSProvider");
             in_stream = streamProvider.GetStream<Tuple>(this.GetPrimaryKey(), "Count");
             await in_stream.SubscribeAsync(this);
@@ -47,8 +42,6 @@ namespace TexeraOrleansPrototype
 
         public override Task OnDeactivateAsync()
         {
-            sw.Flush();
-            fs.Close();
             return base.OnDeactivateAsync();
         }
 

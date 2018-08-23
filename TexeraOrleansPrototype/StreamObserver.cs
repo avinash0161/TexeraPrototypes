@@ -5,16 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Orleans.Streams;
+using System.Diagnostics;
 
 namespace TexeraOrleansPrototype
 {
     public class StreamObserver : IAsyncObserver<int>
     {
-        // private ILogger logger;
-        // public StreamObserver(ILogger logger)
-        // {
-           // this.logger = logger;
-        // }
+        private Stopwatch sw=new Stopwatch();
+
+        public Task Start()
+        {
+            sw.Start();
+            return Task.CompletedTask;
+        }
+
 
         public Task OnCompletedAsync()
         {
@@ -30,6 +34,8 @@ namespace TexeraOrleansPrototype
 
         public Task OnNextAsync(int item, StreamSequenceToken token = null)
         {
+            sw.Stop();
+            Console.WriteLine("Time usage: "+sw.Elapsed);
             Console.WriteLine($"=={item}== count received: by client");
             return Task.CompletedTask;
         }
