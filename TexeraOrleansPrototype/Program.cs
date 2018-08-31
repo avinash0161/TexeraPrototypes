@@ -14,7 +14,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        private static int num_scan = 10;
+        public static int num_scan = 1000;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -52,6 +52,7 @@ namespace TexeraOrleansPrototype
 
                     var streamProvider = client.GetStreamProvider("SMSProvider");
                     var stream = streamProvider.GetStream<int>(Guid.Empty, "Random");
+<<<<<<< HEAD
 
                     await stream.SubscribeAsync(new StreamObserver(0));
                     //await stream.OnNextAsync(-1);
@@ -61,6 +62,14 @@ namespace TexeraOrleansPrototype
                     Task.Run(() => AcceptInputForPauseResume(client));
 
                     System.IO.StreamReader file = new System.IO.StreamReader(@"d:\large_input.csv");
+=======
+                    var so=new StreamObserver();
+                    await stream.SubscribeAsync(so);
+
+                    Task.Run(() => AcceptInputForPauseResume(client));
+
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"median_input.csv");
+>>>>>>> 0897f76f0dfcb5a6b5f7f075196b5f102cc381c3
                     int count = 0;
                     bool need_break = false;
                     List<Orleans.Streams.IAsyncStream<List<Tuple>>> operators = new List<Orleans.Streams.IAsyncStream<List<Tuple>>>();
@@ -80,6 +89,7 @@ namespace TexeraOrleansPrototype
                     Thread.Sleep(1000);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
+                    so.Start();
                     while (true)
                     {
                         string line;
@@ -106,8 +116,7 @@ namespace TexeraOrleansPrototype
                         }
                     }
                     sw.Stop();
-                    Console.WriteLine("Time usage: " + sw.Elapsed);
-                    Console.WriteLine(count + "rows sent");
+                    Console.WriteLine(count + "rows sent in "+ sw.Elapsed);
                     Console.ReadLine();
                     Console.WriteLine("Complete!");
                     Console.ReadLine();

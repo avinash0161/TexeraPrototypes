@@ -35,8 +35,15 @@ namespace TexeraOrleansPrototype
         public Task OnCompletedAsync()
         {
             complete_count++;
+<<<<<<< HEAD
             if (complete_count == 1)
                 out_stream.OnNextAsync(count);
+=======
+            if (complete_count == Program.num_scan)
+                {
+                    out_stream.OnNextAsync(count);
+                }
+>>>>>>> 0897f76f0dfcb5a6b5f7f075196b5f102cc381c3
             return Task.CompletedTask;
         }
 

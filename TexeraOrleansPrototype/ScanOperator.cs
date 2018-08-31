@@ -11,8 +11,6 @@ namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
-        public FileStream fs;
-        public StreamWriter sw;
 
         public Orleans.Streams.IAsyncStream<List<Tuple>> in_stream;
         public Orleans.Streams.IAsyncStream<Tuple> out_stream;
@@ -28,28 +26,22 @@ namespace TexeraOrleansPrototype
 
         public async override Task OnActivateAsync()
         {
-            
-            string path = "Scan_" + this.GetPrimaryKeyLong().ToString();
-            fs = new FileStream(path, FileMode.Create);
-            sw = new StreamWriter(fs);
             var streamProvider = GetStreamProvider("SMSProvider");
             in_stream = streamProvider.GetStream<List<Tuple>>(this.GetPrimaryKey(), "Scan");
             await in_stream.SubscribeAsync(this);
             await base.OnActivateAsync();
-            Console.WriteLine("Scan: init");
+            //Console.WriteLine("Scan: init");
         }
 
         public Task OnCompletedAsync()
         {
-            Console.WriteLine("Scan: END");
+            //Console.WriteLine("Scan: END");
             out_stream.OnCompletedAsync();
             return Task.CompletedTask;
         }
 
         public override Task OnDeactivateAsync()
         {
-            sw.Flush();
-            fs.Close();
             return base.OnDeactivateAsync();
         }
 
