@@ -10,11 +10,9 @@ namespace TexeraOrleansPrototype
     {
         Task SetAggregatorLevel(bool isIntermediate);
         Task<Guid> GetStreamGuid();
-        Task SubmitTuples(Tuple row);
+        Task Process(object row, int seq_token = -2);
+        Task OrderingProcess(object row, int seq_token);
         Task SubmitIntermediateAgg(int aggregation);
-        Task PauseOperator();
-        Task ResumeOperator();
-        Task QuitOperator();
-        Task WakeUp();
+        
     }
 }

@@ -8,10 +8,7 @@ namespace TexeraOrleansPrototype
 {
     public interface IFilterOperator : IGrainWithIntegerKey
     {
-        Task SubmitTuples(Tuple row);
-        Task PauseOperator();
-        Task ResumeOperator();
-        Task QuitOperator();
-        Task WakeUp();
+        Task Process(object row, int seq_token=-2);
+        Task OrderingProcess(object row, int seq_token);
     }
 }
