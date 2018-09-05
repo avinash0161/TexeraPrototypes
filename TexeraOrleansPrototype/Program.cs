@@ -16,10 +16,17 @@ namespace TexeraOrleansPrototype
         public const int num_scan = 1;
         static async Task Main(string[] args)
         {
-            var siloBuilder = new SiloHostBuilder()
-                .UseLocalhostClustering()
+            if (args.Length < 1) return;
+            if (args[0] == "silo")
+            {
+                const string connectionString = "server=texera-test1;uid=root;pwd=pwd;database=orleans;SslMode=none";
+                var siloBuilder = new SiloHostBuilder()
+                 .UseAdoNetClustering(options =>
+                 {
+                     options.ConnectionString = connectionString;
+                     options.Invariant = "MySql.Data.MySqlClient";
+                 })
                 .AddSimpleMessageStreamProvider("SMSProvider")
-                // add storage to store list of subscriptions
                 .AddMemoryGrainStorage("PubSubStore")
                 .UseDashboard(options => { })
                 .Configure<ClusterOptions>(options =>
@@ -27,16 +34,22 @@ namespace TexeraOrleansPrototype
                     options.ClusterId = "dev";
                     options.ServiceId = "TexeraOrleansPrototype";
                 })
-                .Configure<EndpointOptions>(options =>
-                    options.AdvertisedIPAddress = IPAddress.Loopback)
+                .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000)
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole());
-
-            using (var host = siloBuilder.Build())
-            {
+                var host = siloBuilder.Build();
                 await host.StartAsync();
-
+                Console.WriteLine("Silo Started!");
+                Console.ReadLine();
+            }
+            else if (args[0] == "server")
+            {
+                const string connectionString = "server=texera-test1;uid=root;pwd=pwd;database=orleans;SslMode=none";
                 var clientBuilder = new ClientBuilder()
-                    .UseLocalhostClustering()
+                    .UseAdoNetClustering(options =>
+                    {
+                        options.ConnectionString = connectionString;
+                        options.Invariant = "MySql.Data.MySqlClient";
+                    })
                     .AddSimpleMessageStreamProvider("SMSProvider")
                     .Configure<ClusterOptions>(options =>
                     {
@@ -44,35 +57,23 @@ namespace TexeraOrleansPrototype
                         options.ServiceId = "TexeraOrleansPrototype";
                     })
                     .ConfigureLogging(logging => logging.AddConsole());
-
-                using (var client = clientBuilder.Build())
-                {
-                    await client.Connect();
-
-                    Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
-
-                    Console.WriteLine("Client side guid is " + streamGuid);
-                    var stream = client.GetStreamProvider("SMSProvider")
-                    .GetStream<int>(streamGuid, "Random");
-                    var so = new StreamObserver();
-                    await stream.SubscribeAsync(so);
-
-                    
-                    List<IScanOperator> operators = new List<IScanOperator>();
-                    for (int i = 0; i < num_scan; ++i)
-                    {
-                        var t = client.GetGrain<IScanOperator>(i + 2);
-                        operators.Add(t);
-                    }
-                    Thread.Sleep(1000);
-                    await so.Start();
-                    for (int i = 0; i < num_scan; ++i)
-                    {
-                        operators[i].SubmitTuples();
-                    }
-                    Console.ReadLine();
-                    
-                }
+                var client = clientBuilder.Build();
+                await client.Connect();
+                Console.WriteLine("Server Started!");
+                Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
+                Console.WriteLine("Client side guid is " + streamGuid);
+                var stream = client.GetStreamProvider("SMSProvider")
+                .GetStream<int>(streamGuid, "Random");
+                var so = new StreamObserver();
+                await stream.SubscribeAsync(so);
+                await so.Start();
+                for (int i = 0; i < num_scan; ++i)
+                    client.GetGrain<IScanOperator>(i + 2).SubmitTuples();
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine("Invaild Command!");
             }
         }
 
