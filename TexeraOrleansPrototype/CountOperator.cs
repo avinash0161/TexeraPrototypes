@@ -59,7 +59,7 @@ namespace TexeraOrleansPrototype
             }
             else
             {
-                Console.WriteLine("Count processing: " + (row as Tuple).id);
+                Console.WriteLine("Count" + this.GetPrimaryKeyLong() + " processing: " + (row as Tuple).id);
                 count++;
             }
             return Task.CompletedTask;
