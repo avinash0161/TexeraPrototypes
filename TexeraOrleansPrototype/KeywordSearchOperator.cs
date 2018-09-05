@@ -31,10 +31,10 @@ namespace TexeraOrleansPrototype
         public override Task Process(object row, int seq_token = -2)
         {
             if ((row as Tuple).id == -1)
-                Console.WriteLine("KeywordSearch" + this.GetPrimaryKeyLong() + " done");
+                Console.WriteLine("KeywordSearch " + this.GetPrimaryKeyLong() + " done");
             if (true)
             {
-                Console.WriteLine("KeywordSearch" + this.GetPrimaryKeyLong() + " processing: " + (row as Tuple).id);
+                Console.WriteLine("KeywordSearch " + this.GetPrimaryKeyLong() + " processing: " + (row as Tuple).id);
                 nextOperator.SetAggregatorLevel(true);
                 if (seq_token != -2)
                     nextOperator.OrderingProcess(row, seq_token);

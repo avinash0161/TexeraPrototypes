@@ -23,9 +23,9 @@ namespace TexeraOrleansPrototype
 
         public override Task Process(object row, int seq_token = -2)
         {
-            Console.WriteLine("Filter"+ this.GetPrimaryKeyLong()+" Process:" + (row as Tuple).id);
+            Console.WriteLine("Filter "+ this.GetPrimaryKeyLong()+" Process:" + (row as Tuple).id);
             if ((row as Tuple).id == -1)
-                Console.WriteLine("Filter" + this.GetPrimaryKeyLong() + " done");
+                Console.WriteLine("Filter " + this.GetPrimaryKeyLong() + " done");
             if (seq_token != -2)
                 nextOperator.OrderingProcess(row, seq_token);
             else
