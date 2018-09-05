@@ -13,7 +13,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public const int num_scan = 1;
+        public const int num_scan = 5;
         static async Task Main(string[] args)
         {
             if (args.Length < 1) return;
