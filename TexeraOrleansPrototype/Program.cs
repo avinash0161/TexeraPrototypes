@@ -60,7 +60,7 @@ namespace TexeraOrleansPrototype
                 var client = clientBuilder.Build();
                 await client.Connect();
                 Console.WriteLine("Server Started!");
-                Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
+                Guid streamGuid = await client.GetGrain<ICountOperator>(0).GetStreamGuid();
                 Console.WriteLine("Client side guid is " + streamGuid);
                 var stream = client.GetStreamProvider("SMSProvider")
                 .GetStream<int>(streamGuid, "Random");
@@ -68,7 +68,7 @@ namespace TexeraOrleansPrototype
                 await stream.SubscribeAsync(so);
                 await so.Start();
                 for (int i = 0; i < num_scan; ++i)
-                    client.GetGrain<IScanOperator>(i + 2).SubmitTuples();
+                    client.GetGrain<IScanOperator>(i + 1).SubmitTuples();
                 Console.ReadLine();
             }
             else
