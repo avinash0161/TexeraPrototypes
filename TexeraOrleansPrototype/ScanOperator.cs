@@ -13,12 +13,12 @@ namespace TexeraOrleansPrototype
         public bool pause = false;
         public List<Tuple> pausedRows = new List<Tuple>();
 
-        public IFilterOperator nextOperator;
+        public IOrderedFilterOperator nextOperator;
         System.IO.StreamReader file;
 
         public override Task OnActivateAsync()
         {
-            nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
             string p2 = @"d:\small_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
             file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
@@ -31,13 +31,13 @@ namespace TexeraOrleansPrototype
         public async Task SubmitTuples() 
         {
             string line;
-            int count = 0;
+            ulong count = 0;
             while ((line = file.ReadLine()) != null)
             {
-                nextOperator.OrderingProcess(new Tuple(count, line.Split(",")),count);
+                nextOperator.Process(new Tuple(count,(int)count, line.Split(",")));
                 count++;
             }
-            nextOperator.OrderingProcess(new Tuple(-1, null),count);
+            nextOperator.Process(new Tuple(count ,- 1, null));
 
             Console.WriteLine("Scan "+ this.GetPrimaryKeyLong().ToString() + " done");
         }

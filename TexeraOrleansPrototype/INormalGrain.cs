@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace TexeraOrleansPrototype
 {
-    public interface IOrderingGrain: INormalGrain
+    public interface INormalGrain : IGrainWithIntegerKey
     {
-
+        Task Process(object row);
     }
 }

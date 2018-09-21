@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace TexeraOrleansPrototype
 {
-    public interface IKeywordSearchOperator : IGrainWithIntegerKey
+    public interface IOrderedKeywordSearchOperator : IOrderingGrain
     {
         Task<Guid> GetStreamGuid();
-        Task Process(object row,int seq_token=-2);
-        Task OrderingProcess(object row, int seq_token);
+    }
+
+    public interface IKeywordSearchOperator : INormalGrain
+    {
+        Task<Guid> GetStreamGuid();
     }
 }

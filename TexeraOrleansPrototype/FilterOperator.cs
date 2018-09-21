@@ -8,29 +8,42 @@ using System.IO;
 
 namespace TexeraOrleansPrototype
 {
-    public class FilterOperator : OrderingGrain, IFilterOperator
+    public class OrderedFilterOperator : OrderingGrain, IOrderedFilterOperator
     {
-        public IKeywordSearchOperator nextOperator;
         public override Task OnActivateAsync()
         {
-            nextOperator = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
+            next_op = base.GrainFactory.GetGrain<IOrderedKeywordSearchOperator>(this.GetPrimaryKeyLong());
             return base.OnActivateAsync();
         }
-        public override Task OnDeactivateAsync()
-        {
-            return base.OnDeactivateAsync();
-        }
 
-        public override Task Process(object row, int seq_token = -2)
+        public override Task Process_impl(ref object row)
         {
-            Console.WriteLine("Filter Process:" + (row as Tuple).id);
+            Console.WriteLine("Ordered Filter Process:" + (row as Tuple).id);
             if ((row as Tuple).id == -1)
-                Console.WriteLine("Filter done");
-            if (seq_token != -2)
-                nextOperator.OrderingProcess(row, seq_token);
-            else
-                nextOperator.Process(row);
+            {
+                Console.WriteLine("Ordered Filter done");
+            }
             return Task.CompletedTask;
         }
     }
+
+    public class FilterOperator : NormalGrain, IFilterOperator
+    {
+        public override Task OnActivateAsync()
+        {
+            next_op = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
+            return base.OnActivateAsync();
+        }
+
+        public override Task Process_impl(ref object row)
+        {
+            Console.WriteLine("Unordered Filter Process:" + (row as Tuple).id);
+            if ((row as Tuple).id == -1)
+            {
+                Console.WriteLine("Unordered Filter done");
+            }
+            return Task.CompletedTask;
+        }
+    }
+
 }

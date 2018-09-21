@@ -2,6 +2,7 @@ namespace TexeraOrleansPrototype {
 
     public class Tuple
     {
+        public ulong seq_token;
         public int id;
         public string region;
         /*
@@ -21,8 +22,9 @@ namespace TexeraOrleansPrototype {
         public float total_cost;
         public float total_profit;
         */
-        public Tuple(int id,string[] list) 
+        public Tuple(ulong seq_token,int id,string[] list) 
         {
+            this.seq_token = seq_token;
             this.id = id;
             if (list == null)
                 return;

@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 
 namespace TexeraOrleansPrototype
 {
-    public interface ICountOperator : IGrainWithIntegerKey
+    public interface IOrderedCountOperator : IOrderingGrain
     {
         Task SetAggregatorLevel(bool isIntermediate);
         Task<Guid> GetStreamGuid();
-        Task Process(object row, int seq_token = -2);
-        Task OrderingProcess(object row, int seq_token);
         Task SubmitIntermediateAgg(int aggregation);
         
     }
+
+    public interface ICountOperator : INormalGrain
+    {
+        Task SetAggregatorLevel(bool isIntermediate);
+        Task<Guid> GetStreamGuid();
+        Task SubmitIntermediateAgg(int aggregation);
+
+    }
+
 }

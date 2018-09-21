@@ -8,18 +8,13 @@ using System.IO;
 
 namespace TexeraOrleansPrototype
 {
-    public class KeywordSearchOperator : OrderingGrain, IKeywordSearchOperator
+    public class OrderedKeywordSearchOperator : OrderingGrain, IOrderedKeywordSearchOperator
     {
         private Guid guid = Guid.NewGuid();
-        ICountOperator nextOperator;
         public override Task OnActivateAsync()
         {
-            nextOperator = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            next_op = this.GrainFactory.GetGrain<IOrderedCountOperator>(this.GetPrimaryKeyLong());
             return base.OnActivateAsync();
-        }
-        public override Task OnDeactivateAsync()
-        {
-            return base.OnDeactivateAsync();
         }
 
         public Task<Guid> GetStreamGuid()
@@ -27,22 +22,43 @@ namespace TexeraOrleansPrototype
             return Task.FromResult(guid);
         }
 
-
-        public override Task Process(object row, int seq_token = -2)
+        public override Task Process_impl(ref object row)
         {
             if ((row as Tuple).id == -1)
-                Console.WriteLine("KeywordSearch done");
+                Console.WriteLine("Ordered KeywordSearch done");
             if (true)
             {
-                Console.WriteLine("KeywordSearch processing: "+(row as Tuple).id);
-                nextOperator.SetAggregatorLevel(true);
-                if (seq_token != -2)
-                    nextOperator.OrderingProcess(row, seq_token);
-                else
-                    nextOperator.Process(row);
+                Console.WriteLine("Ordered KeywordSearch processing: "+(row as Tuple).id);
+                (next_op as IOrderedCountOperator).SetAggregatorLevel(true);
             }
             return Task.CompletedTask;
         }
+    }
 
+    public class KeywordSearchOperator : NormalGrain, IKeywordSearchOperator
+    {
+        private Guid guid = Guid.NewGuid();
+        public override Task OnActivateAsync()
+        {
+            next_op = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            return base.OnActivateAsync();
+        }
+
+        public Task<Guid> GetStreamGuid()
+        {
+            return Task.FromResult(guid);
+        }
+
+        public override Task Process_impl(ref object row)
+        {
+            if ((row as Tuple).id == -1)
+                Console.WriteLine("Unordered KeywordSearch done");
+            if (true)
+            {
+                Console.WriteLine("Unordered KeywordSearch processing: " + (row as Tuple).id);
+                (next_op as ICountOperator).SetAggregatorLevel(true);
+            }
+            return Task.CompletedTask;
+        }
     }
 }

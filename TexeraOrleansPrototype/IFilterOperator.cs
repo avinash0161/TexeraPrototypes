@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace TexeraOrleansPrototype
 {
-    public interface IFilterOperator : IGrainWithIntegerKey
+    public interface IOrderedFilterOperator : IOrderingGrain
     {
-        Task Process(object row, int seq_token=-2);
-        Task OrderingProcess(object row, int seq_token);
+    }
+
+    public interface IFilterOperator : INormalGrain
+    {
     }
 }
