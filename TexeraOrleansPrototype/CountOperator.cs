@@ -49,7 +49,7 @@ namespace TexeraOrleansPrototype
             }
             else
             {
-                Console.WriteLine("Ordered Count processing: " + (row as Tuple).id);
+                Console.WriteLine("Ordered Count processing: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
                 count++;
             }
             return Task.CompletedTask;
@@ -99,7 +99,7 @@ namespace TexeraOrleansPrototype
             }
             else
             {
-                Console.WriteLine("Unordered Count processing: " + (row as Tuple).id);
+                Console.WriteLine("Unordered Count processing: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
                 count++;
             }
             return Task.CompletedTask;

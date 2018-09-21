@@ -18,11 +18,11 @@ namespace TexeraOrleansPrototype
 
         public override Task Process_impl(ref object row)
         {
-            Console.WriteLine("Ordered Filter Process:" + (row as Tuple).id);
+            Console.WriteLine("Ordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
             if ((row as Tuple).id == -1)
-            {
                 Console.WriteLine("Ordered Filter done");
-            }
+            else if (!((row as Tuple).unit_cost > 50))
+                row = null;
             return Task.CompletedTask;
         }
     }
@@ -37,11 +37,11 @@ namespace TexeraOrleansPrototype
 
         public override Task Process_impl(ref object row)
         {
-            Console.WriteLine("Unordered Filter Process:" + (row as Tuple).id);
+            Console.WriteLine("Unordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
             if ((row as Tuple).id == -1)
-            {
                 Console.WriteLine("Unordered Filter done");
-            }
+            else if (!((row as Tuple).unit_cost > 50))
+                row = null;
             return Task.CompletedTask;
         }
     }

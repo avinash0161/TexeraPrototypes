@@ -24,13 +24,13 @@ namespace TexeraOrleansPrototype
 
         public override Task Process_impl(ref object row)
         {
+            Console.WriteLine("Ordered KeywordSearch processing: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
             if ((row as Tuple).id == -1)
                 Console.WriteLine("Ordered KeywordSearch done");
-            if (true)
-            {
-                Console.WriteLine("Ordered KeywordSearch processing: "+(row as Tuple).id);
+            else if ((row as Tuple).region.Contains("Asia"))
                 (next_op as IOrderedCountOperator).SetAggregatorLevel(true);
-            }
+            else
+                row = null;
             return Task.CompletedTask;
         }
     }
@@ -51,13 +51,13 @@ namespace TexeraOrleansPrototype
 
         public override Task Process_impl(ref object row)
         {
+            Console.WriteLine("Unordered KeywordSearch processing: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
             if ((row as Tuple).id == -1)
                 Console.WriteLine("Unordered KeywordSearch done");
-            if (true)
-            {
-                Console.WriteLine("Unordered KeywordSearch processing: " + (row as Tuple).id);
+            else if ((row as Tuple).region.Contains("Asia"))
                 (next_op as ICountOperator).SetAggregatorLevel(true);
-            }
+            else
+                row = null;
             return Task.CompletedTask;
         }
     }
