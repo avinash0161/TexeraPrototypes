@@ -29,8 +29,8 @@ namespace TexeraOrleansPrototype
                 })
                 .Configure<EndpointOptions>(options =>
                     options.AdvertisedIPAddress = IPAddress.Loopback)
-                .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole());
-
+                .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole())
+                .Configure<MessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 60; });
             using (var host = siloBuilder.Build())
             {
                 await host.StartAsync();
