@@ -46,20 +46,24 @@ namespace TexeraOrleansPrototype
 
         private void ProcessStashed()
         {
-            if (stashed.ContainsKey(current_idx))
+            while (true)
             {
-                var obj = stashed[current_idx];
-                Process_impl(ref obj);
-                if (obj != null)
+                if (stashed.ContainsKey(current_idx))
                 {
-                    if (next_op is IOrderingGrain)
-                        (obj as Tuple).seq_token = current_seq_num++;
-                    if (next_op != null)
-                        next_op.Process(obj);
+                    var obj = stashed[current_idx];
+                    Process_impl(ref obj);
+                    if (obj != null)
+                    {
+                        if (next_op is IOrderingGrain)
+                            (obj as Tuple).seq_token = current_seq_num++;
+                        if (next_op != null)
+                            next_op.Process(obj);
+                    }
+                    stashed.Remove(current_idx);
+                    current_idx++;
                 }
-                stashed.Remove(current_idx);
-                current_idx++;
-                ProcessStashed();
+                else
+                    break;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -13,7 +14,8 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public const int num_scan = 1;
+        public const int num_scan = 10;
+        public const bool conditions_on = false;
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
