@@ -15,6 +15,11 @@ namespace TexeraOrleansPrototype
         public Task Process(object obj)
         {
             var seq_token = (obj as Tuple).seq_token;
+            if(seq_token < current_idx)
+            {
+                // de-dup messages
+                return Task.CompletedTask;
+            }
             if (seq_token != current_idx)
                 stashed.Add(seq_token, obj);
             else
