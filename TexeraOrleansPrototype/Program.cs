@@ -14,7 +14,7 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public const int num_scan = 1;
+        public const int num_scan = 10;
         public const bool conditions_on = false;
         static async Task Main(string[] args)
         {
@@ -67,9 +67,12 @@ namespace TexeraOrleansPrototype
                         operators.Add(t);
                     }
                     Thread.Sleep(1000);
+                    Console.WriteLine("Start loading tuples");
                     for (int i = 0; i < num_scan; ++i)
                         await operators[i].LoadTuples();
+                    Console.WriteLine("Finish loading tuples");
                     await so.Start();
+                    Console.WriteLine("Start experiment");
                     for (int i = 0; i < num_scan; ++i)
                     {
                         operators[i].SubmitTuples();

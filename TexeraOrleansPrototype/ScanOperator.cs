@@ -17,8 +17,8 @@ namespace TexeraOrleansPrototype
         public override Task OnActivateAsync()
         {
             nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
-            //string p2 = @"d:\median_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
-            string p2 = @"d:\median_input.csv";
+            string p2 = @"d:\median_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
+            //string p2 = @"d:\median_input.csv";
             file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
         }
@@ -32,7 +32,7 @@ namespace TexeraOrleansPrototype
             for (int i = 0; i < Rows.Count; ++i)
                 nextOperator.Process(Rows[i]);
             nextOperator.Process(new Tuple((ulong)Rows.Count ,- 1, null));
-            Console.WriteLine("Scan "+ this.GetPrimaryKeyLong().ToString() + " done");
+            Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
         }
 
@@ -46,6 +46,7 @@ namespace TexeraOrleansPrototype
                 Rows.Add(new Tuple(count, (int)count, line.Split(",")));
                 count++;
             }
+            Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " loading done");
             return Task.CompletedTask;
         }
        
