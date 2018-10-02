@@ -10,17 +10,15 @@ namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
-        public bool pause = false;
-        public List<Tuple> pausedRows = new List<Tuple>();
-
+        public List<Tuple> Rows = new List<Tuple>();
         public INormalGrain nextOperator;
         System.IO.StreamReader file;
 
         public override Task OnActivateAsync()
         {
-            nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
-            string p2 = @"d:\median_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
-            //string p2 = @"d:\median_input.csv";
+            nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
+            //string p2 = @"d:\median_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
+            string p2 = @"d:\median_input.csv";
             file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
         }
@@ -29,20 +27,27 @@ namespace TexeraOrleansPrototype
             return base.OnDeactivateAsync();
         }
 
-        public async Task SubmitTuples() 
+        public Task SubmitTuples() 
+        {
+            for (int i = 0; i < Rows.Count; ++i)
+                nextOperator.Process(Rows[i]);
+            nextOperator.Process(new Tuple((ulong)Rows.Count ,- 1, null));
+            Console.WriteLine("Scan "+ this.GetPrimaryKeyLong().ToString() + " done");
+            return Task.CompletedTask;
+        }
+
+
+        public Task LoadTuples()
         {
             string line;
             ulong count = 0;
             while ((line = file.ReadLine()) != null)
             {
-                nextOperator.Process(new Tuple(count,(int)count, line.Split(",")));
+                Rows.Add(new Tuple(count, (int)count, line.Split(",")));
                 count++;
             }
-            nextOperator.Process(new Tuple(count ,- 1, null));
-
-            Console.WriteLine("Scan "+ this.GetPrimaryKeyLong().ToString() + " done");
+            return Task.CompletedTask;
         }
-
        
     }
 }

@@ -9,5 +9,7 @@ namespace TexeraOrleansPrototype
     public interface IScanOperator : IGrainWithIntegerKey
     {
         Task SubmitTuples();
+
+        Task LoadTuples();
     }
 }
