@@ -21,7 +21,10 @@ namespace TexeraOrleansPrototype
                 return Task.CompletedTask;
             }
             if (seq_token != current_idx)
+            {
                 stashed.Add(seq_token, obj);
+                Console.WriteLine("Stashed " + seq_token + " !");
+            }
             else
             {
                 Process_impl(ref obj);
