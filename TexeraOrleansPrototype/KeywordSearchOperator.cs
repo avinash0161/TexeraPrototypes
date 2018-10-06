@@ -18,14 +18,11 @@ namespace TexeraOrleansPrototype
         private Guid guid = Guid.NewGuid();
         public override Task OnActivateAsync()
         {
-            next_op = this.GrainFactory.GetGrain<IOrderedCountOperator>(this.GetPrimaryKeyLong());
+            var streamProvider = GetStreamProvider("SMSProvider");
+            current_op = streamProvider.GetStream<object>(this.GetPrimaryKey(), "OrderedKeywordSearch");
             return base.OnActivateAsync();
         }
 
-        public Task<Guid> GetStreamGuid()
-        {
-            return Task.FromResult(guid);
-        }
 
         public override Task Process_impl(ref object row)
         {
@@ -43,7 +40,7 @@ namespace TexeraOrleansPrototype
                 finished = true;
             }
             else if (cond)
-                (next_op as IOrderedCountOperator).SetAggregatorLevel(true);
+                ;
             else
                 row = null;
             return Task.CompletedTask;
@@ -56,13 +53,9 @@ namespace TexeraOrleansPrototype
         private Guid guid = Guid.NewGuid();
         public override Task OnActivateAsync()
         {
-            next_op = this.GrainFactory.GetGrain<ICountOperator>(this.GetPrimaryKeyLong());
+            var streamProvider = GetStreamProvider("SMSProvider");
+            current_op = streamProvider.GetStream<object>(this.GetPrimaryKey(), "KeywordSearch");
             return base.OnActivateAsync();
-        }
-
-        public Task<Guid> GetStreamGuid()
-        {
-            return Task.FromResult(guid);
         }
 
         public override Task Process_impl(ref object row)
@@ -81,7 +74,7 @@ namespace TexeraOrleansPrototype
                 finished = true;
             }
             else if (cond)
-                (next_op as ICountOperator).SetAggregatorLevel(true);
+                ;
             else
                 row = null;
             return Task.CompletedTask;

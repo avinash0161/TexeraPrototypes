@@ -15,10 +15,11 @@ namespace TexeraOrleansPrototype
     public class OrderedFilterOperator : OrderingGrain, IOrderedFilterOperator
     {
         bool finished = false;
-        public override Task OnActivateAsync()
+        public async override Task OnActivateAsync()
         {
-            next_op = base.GrainFactory.GetGrain<IOrderedKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            return base.OnActivateAsync();
+            var streamProvider = GetStreamProvider("SMSProvider");
+            current_op = streamProvider.GetStream<object>(this.GetPrimaryKey(), "OrderedFilter");
+            await base.OnActivateAsync();
         }
 
         public override Task Process_impl(ref object row)
@@ -45,10 +46,11 @@ namespace TexeraOrleansPrototype
     public class FilterOperator : NormalGrain, IFilterOperator
     {
         bool finished = false;
-        public override Task OnActivateAsync()
+        public async override Task OnActivateAsync()
         {
-            next_op = base.GrainFactory.GetGrain<IKeywordSearchOperator>(this.GetPrimaryKeyLong());
-            return base.OnActivateAsync();
+            var streamProvider = GetStreamProvider("SMSProvider");
+            current_op = streamProvider.GetStream<object>(this.GetPrimaryKey(), "Filter");
+            await base.OnActivateAsync();
         }
 
         public override Task Process_impl(ref object row)

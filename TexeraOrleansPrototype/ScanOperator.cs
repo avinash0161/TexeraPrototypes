@@ -5,20 +5,29 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using Orleans.Streams;
 
 namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
         public List<Tuple> Rows = new List<Tuple>();
-        public INormalGrain nextOperator;
+        public IAsyncStream<object> nextOperator;
         System.IO.StreamReader file;
 
         public override Task OnActivateAsync()
         {
-            nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
-            //string p2 = @"d:\large_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
-            string p2 = @"d:\median_input.csv";
+            //nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
+            string p2;
+            if (Program.num_scan == 1)
+                p2 = @"d:\" + Program.dataset + "_input.csv";
+            else
+                p2 = @"d:\" + Program.dataset + "_input" + "_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
+            var streamProvider = GetStreamProvider("SMSProvider");
+            if(Program.ordered_on)
+                nextOperator = streamProvider.GetStream<object>(this.GetPrimaryKey(), "OrderedFilter");
+            else
+                nextOperator = streamProvider.GetStream<object>(this.GetPrimaryKey(), "Filter");
             file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
         }
@@ -30,8 +39,8 @@ namespace TexeraOrleansPrototype
         public Task SubmitTuples() 
         {
             for (int i = 0; i < Rows.Count; ++i)
-                nextOperator.Process(Rows[i]);
-            nextOperator.Process(new Tuple((ulong)Rows.Count ,- 1, null));
+                nextOperator.OnNextAsync(Rows[i]);
+            nextOperator.OnNextAsync(new Tuple((ulong)Rows.Count ,- 1, null));
             Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
         }

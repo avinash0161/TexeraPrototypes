@@ -10,47 +10,25 @@ namespace TexeraOrleansPrototype
 
     public class OrderedCountOperator : OrderingGrain, IOrderedCountOperator
     {
-        private Guid guid = Guid.NewGuid();
-        public bool isIntermediate = false;
-        public int count = 0;
-        public int intermediateAggregatorsResponded = 0;
-        public Task SetAggregatorLevel(bool isIntermediate)
+        int count = 0;
+        public override Task OnActivateAsync()
         {
-            this.isIntermediate = isIntermediate;
-            return Task.CompletedTask;
-        }
-
-        public Task<Guid> GetStreamGuid()
-        {
-            return Task.FromResult(guid);
-        }
-
-        public Task SubmitIntermediateAgg(int aggregation)
-        {
-            count += aggregation;
-            intermediateAggregatorsResponded++;
-
-            if (intermediateAggregatorsResponded == Program.num_scan)
-            {
-                var streamProvider = GetStreamProvider("SMSProvider");
-                var stream = streamProvider.GetStream<int>(guid, "Random");
-                stream.OnNextAsync(count);
-            }
-            return Task.CompletedTask;
+            var streamProvider = GetStreamProvider("SMSProvider");
+            current_op = streamProvider.GetStream<object>(this.GetPrimaryKey(), "OrderedCount");
+            return base.OnActivateAsync();
         }
 
         public override Task Process_impl(ref object row)
         {
             if ((row as Tuple).id == -1)
             {
-                ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
-                finalAggregator.SetAggregatorLevel(false);
-                finalAggregator.SubmitIntermediateAgg(count);
+                row = count;
             }
             else
             {
                 //Console.WriteLine("Ordered Count processing: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
                 count++;
+                row = null;
             }
             return Task.CompletedTask;
         }
@@ -60,47 +38,27 @@ namespace TexeraOrleansPrototype
 
     public class CountOperator : NormalGrain, ICountOperator
     {
-        private Guid guid = Guid.NewGuid();
-        public bool isIntermediate = false;
-        public int count = 0;
-        public int intermediateAggregatorsResponded = 0;
-        public Task SetAggregatorLevel(bool isIntermediate)
+        int count = 0;
+
+        public override Task OnActivateAsync()
         {
-            this.isIntermediate = isIntermediate;
-            return Task.CompletedTask;
+            var streamProvider = GetStreamProvider("SMSProvider");
+            current_op = streamProvider.GetStream<object>(this.GetPrimaryKey(), "Count");
+            return base.OnActivateAsync();
         }
 
-        public Task<Guid> GetStreamGuid()
-        {
-            return Task.FromResult(guid);
-        }
-
-        public Task SubmitIntermediateAgg(int aggregation)
-        {
-            count += aggregation;
-            intermediateAggregatorsResponded++;
-
-            if (intermediateAggregatorsResponded == Program.num_scan)
-            {
-                var streamProvider = GetStreamProvider("SMSProvider");
-                var stream = streamProvider.GetStream<int>(guid, "Random");
-                stream.OnNextAsync(count);
-            }
-            return Task.CompletedTask;
-        }
-
+      
         public override Task Process_impl(ref object row)
         {
             if ((row as Tuple).id == -1)
             {
-                ICountOperator finalAggregator = this.GrainFactory.GetGrain<ICountOperator>(1);
-                finalAggregator.SetAggregatorLevel(false);
-                finalAggregator.SubmitIntermediateAgg(count);
+                row = count;
             }
             else
             {
                 //Console.WriteLine("Unordered Count processing: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
                 count++;
+                row = null;
             }
             return Task.CompletedTask;
         }

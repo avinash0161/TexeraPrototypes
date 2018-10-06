@@ -8,11 +8,9 @@ namespace TexeraOrleansPrototype
 {
     public interface IOrderedKeywordSearchOperator : IOrderingGrain
     {
-        Task<Guid> GetStreamGuid();
     }
 
     public interface IKeywordSearchOperator : INormalGrain
     {
-        Task<Guid> GetStreamGuid();
     }
 }
