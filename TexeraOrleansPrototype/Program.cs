@@ -16,6 +16,8 @@ namespace TexeraOrleansPrototype
     {
         public const int num_scan = 1;
         public const bool conditions_on = false;
+        public const bool ordered_on = false;
+        public const string dataset = "median";
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -59,7 +61,14 @@ namespace TexeraOrleansPrototype
                     var so = new StreamObserver();
                     await stream.SubscribeAsync(so);
 
-                    
+                    Console.WriteLine();
+                    Console.WriteLine("Configuration:");
+                    Console.WriteLine("# of workflows: " + Program.num_scan);
+                    Console.WriteLine("FIFO & exactly-once: " + Program.ordered_on);
+                    Console.WriteLine("dataset: " + Program.dataset);
+                    Console.WriteLine("with conditions: " + Program.conditions_on);
+                    Console.WriteLine();
+
                     List<IScanOperator> operators = new List<IScanOperator>();
                     for (int i = 0; i < num_scan; ++i)
                     {

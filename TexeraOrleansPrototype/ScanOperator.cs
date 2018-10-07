@@ -16,9 +16,15 @@ namespace TexeraOrleansPrototype
 
         public override Task OnActivateAsync()
         {
-            nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
-            //string p2 = @"d:\large_input_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
-            string p2 = @"d:\median_input.csv";
+            if(Program.ordered_on)
+                nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
+            else
+                nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            string p2;
+            if (Program.num_scan == 1)
+                p2 = @"d:\" + Program.dataset + "_input.csv";
+            else
+                p2 = @"d:\" + Program.dataset + "_input" + "_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
             file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
         }
