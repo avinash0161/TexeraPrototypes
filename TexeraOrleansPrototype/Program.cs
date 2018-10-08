@@ -14,12 +14,12 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public const int num_scan = 10;
+        public const int num_scan = 1;
         public const bool conditions_on = false;
         public const bool ordered_on = false;
         public const string dataset = "median"; // should be 'medium', but anyway...
         public const string delivery = "Streams";
-        public const string dir = @"d:\";
+        public const string dir = @"/home/sheng/datasets/";
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
