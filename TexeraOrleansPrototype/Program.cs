@@ -18,6 +18,8 @@ namespace TexeraOrleansPrototype
         public const bool conditions_on = false;
         public const bool ordered_on = false;
         public const string dataset = "median";
+        public const string delivery = "RPC";
+        public const string dir= @"d:\";
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -63,6 +65,7 @@ namespace TexeraOrleansPrototype
 
                     Console.WriteLine();
                     Console.WriteLine("Configuration:");
+                    Console.WriteLine("Delivery: " + delivery);
                     Console.WriteLine("# of workflows: " + Program.num_scan);
                     Console.WriteLine("FIFO & exactly-once: " + Program.ordered_on);
                     Console.WriteLine("dataset: " + Program.dataset);

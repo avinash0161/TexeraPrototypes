@@ -22,9 +22,9 @@ namespace TexeraOrleansPrototype
                 nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
             string p2;
             if (Program.num_scan == 1)
-                p2 = @"d:\" + Program.dataset + "_input.csv";
+                p2 = Program.dir + Program.dataset + "_input.csv";
             else
-                p2 = @"d:\" + Program.dataset + "_input" + "_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
+                p2 = Program.dir + Program.dataset + "_input" + "_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
             file = new System.IO.StreamReader(p2);
             return base.OnActivateAsync();
         }
