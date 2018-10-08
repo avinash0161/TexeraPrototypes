@@ -39,6 +39,7 @@ namespace TexeraOrleansPrototype
             sw.Stop();
             Console.WriteLine("Time usage: " + sw.Elapsed);
             Console.WriteLine($"=={item}== count received: by client");
+            Environment.Exit(0);
             return Task.CompletedTask;
         }
     }
