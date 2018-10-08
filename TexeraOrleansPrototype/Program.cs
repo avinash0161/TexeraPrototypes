@@ -19,7 +19,7 @@ namespace TexeraOrleansPrototype
         public const bool ordered_on = false;
         public const string dataset = "median";
         public const string delivery = "RPC";
-        public const string dir= @"d:\";
+        public const string dir= @"/home/sheng/datasets/";
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
