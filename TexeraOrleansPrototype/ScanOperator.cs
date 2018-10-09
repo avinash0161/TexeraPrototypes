@@ -39,7 +39,10 @@ namespace TexeraOrleansPrototype
         public Task SubmitTuples() 
         {
             for (int i = 0; i < Rows.Count; ++i)
-                nextOperator.OnNextAsync(Rows[i]);
+            {
+		Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending "+i.ToString());
+		nextOperator.OnNextAsync(Rows[i]);
+	        }
             nextOperator.OnNextAsync(new Tuple((ulong)Rows.Count ,- 1, null));
             Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
