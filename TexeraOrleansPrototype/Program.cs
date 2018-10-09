@@ -74,7 +74,7 @@ namespace TexeraOrleansPrototype
                     {
                         var t = client.GetGrain<IScanOperator>(i + 2);
                         operators.Add(t);
-                        if (ordered_on)
+                                                if (ordered_on)
                         {
                             await client.GetGrain<IOrderedFilterOperator>(i + 2).OutTo("OrderedKeywordSearch");
                             await client.GetGrain<IOrderedKeywordSearchOperator>(i + 2).OutTo("OrderedCount");
@@ -87,6 +87,7 @@ namespace TexeraOrleansPrototype
                             await client.GetGrain<ICountOperator>(i + 2).OutTo("CountFinal", true);
                         }
                         await client.GetGrain<ICountFinalOperator>(1).OutTo("Random", true);
+
                     }
                     Thread.Sleep(1000);
                     Console.WriteLine("Start loading tuples");
@@ -97,7 +98,7 @@ namespace TexeraOrleansPrototype
                     Console.WriteLine("Start experiment");
                     for (int i = 0; i < num_scan; ++i)
                     {
-                        operators[i].SubmitTuples();
+                          operators[i].SubmitTuples();
                     }
                     Console.ReadLine();
                     
