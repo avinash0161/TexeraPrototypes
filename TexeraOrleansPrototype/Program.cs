@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -17,7 +16,7 @@ namespace TexeraOrleansPrototype
         public const int num_scan = 1;
         public const bool conditions_on = false;
         public const bool ordered_on = false;
-        public const string dataset = "median";
+        public const string dataset = "large";
         public const string delivery = "RPC";
         public const string dir= @"/home/sheng/datasets/";
         static async Task Main(string[] args)
