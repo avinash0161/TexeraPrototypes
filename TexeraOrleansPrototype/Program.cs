@@ -14,12 +14,6 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public const int num_scan = 1;
-        public const bool conditions_on = false;
-        public const bool ordered_on = false;
-        public const string dataset = "large"; // should be 'medium', but anyway...
-        public const string delivery = "Streams";
-        public const string dir = @"/home/sheng/datasets/";
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -37,6 +31,7 @@ namespace TexeraOrleansPrototype
                     options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole())
                 .Configure<MessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 60; });
+
             using (var host = siloBuilder.Build())
             {
                 await host.StartAsync();
@@ -57,24 +52,25 @@ namespace TexeraOrleansPrototype
                     Guid streamGuid = Guid.Empty;
                     var streamProvider = client.GetStreamProvider("SMSProvider");
                     var stream = streamProvider.GetStream<int>(streamGuid, "Random");
-                    var so = new StreamObserver();
+                    var so = new ClientStreamObserver();
                     await stream.SubscribeAsync(so);
 
                     Console.WriteLine();
                     Console.WriteLine("Configuration:");
-                    Console.WriteLine("Delivery: " + delivery);
-                    Console.WriteLine("# of workflows: " + Program.num_scan);
-                    Console.WriteLine("FIFO & exactly-once: " + Program.ordered_on);
-                    Console.WriteLine("dataset: " + Program.dataset);
-                    Console.WriteLine("with conditions: " + Program.conditions_on);
+                    Console.WriteLine("Delivery: " + TexeraConfig.delivery);
+                    Console.WriteLine("# of workflows: " + TexeraConfig.num_scan);
+                    Console.WriteLine("FIFO & exactly-once: " + TexeraConfig.ordered_on);
+                    Console.WriteLine("dataset: " + TexeraConfig.dataset);
+                    Console.WriteLine("with conditions: " + TexeraConfig.conditions_on);
+                    Console.WriteLine("Number of grains for each operator: " + TexeraConfig.num_scan);
                     Console.WriteLine();
 
                     List<IScanOperator> operators = new List<IScanOperator>();
-                    for (int i = 0; i < num_scan; ++i)
+                    for (int i = 0; i < TexeraConfig.num_scan; ++i)
                     {
                         var t = client.GetGrain<IScanOperator>(i + 2);
                         operators.Add(t);
-                                                if (ordered_on)
+                        if (TexeraConfig.ordered_on)
                         {
                             await client.GetGrain<IOrderedFilterOperator>(i + 2).OutTo("OrderedKeywordSearch");
                             await client.GetGrain<IOrderedKeywordSearchOperator>(i + 2).OutTo("OrderedCount");
@@ -91,12 +87,12 @@ namespace TexeraOrleansPrototype
                     }
                     Thread.Sleep(1000);
                     Console.WriteLine("Start loading tuples");
-                    for (int i = 0; i < num_scan; ++i)
+                    for (int i = 0; i < TexeraConfig.num_scan; ++i)
                         await operators[i].LoadTuples();
                     Console.WriteLine("Finish loading tuples");
                     await so.Start();
                     Console.WriteLine("Start experiment");
-                    for (int i = 0; i < num_scan; ++i)
+                    for (int i = 0; i < TexeraConfig.num_scan; ++i)
                     {
                           operators[i].SubmitTuples();
                     }

@@ -19,12 +19,12 @@ namespace TexeraOrleansPrototype
         {
             //nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
             string p2;
-            if (Program.num_scan == 1)
-                p2 = Program.dir + Program.dataset + "_input.csv";
+            if (TexeraConfig.num_scan == 1)
+                p2 = TexeraConfig.dir + TexeraConfig.dataset + "_input.csv";
             else
-                p2 = Program.dir + Program.dataset + "_input" + "_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
+                p2 = TexeraConfig.dir + TexeraConfig.dataset + "_input" + "_" + (this.GetPrimaryKeyLong() - 1) + ".csv";
             var streamProvider = GetStreamProvider("SMSProvider");
-            if(Program.ordered_on)
+            if(TexeraConfig.ordered_on)
                 nextOperator = streamProvider.GetStream<object>(this.GetPrimaryKey(), "OrderedFilter");
             else
                 nextOperator = streamProvider.GetStream<object>(this.GetPrimaryKey(), "Filter");
@@ -40,11 +40,11 @@ namespace TexeraOrleansPrototype
         {
             for (int i = 0; i < Rows.Count; ++i)
             {
-		Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending "+i.ToString());
+		// Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending "+i.ToString());
 		nextOperator.OnNextAsync(Rows[i]);
 	        }
             nextOperator.OnNextAsync(new Tuple((ulong)Rows.Count ,- 1, null));
-            Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
+            // Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
         }
 

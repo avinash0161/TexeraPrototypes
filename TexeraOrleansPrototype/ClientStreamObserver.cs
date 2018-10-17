@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace TexeraOrleansPrototype
 {
-    public class StreamObserver : IAsyncObserver<int>
+    public class ClientStreamObserver : IAsyncObserver<int>
     {
         Stopwatch sw=new Stopwatch();
 

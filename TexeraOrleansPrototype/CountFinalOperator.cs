@@ -26,7 +26,7 @@ namespace TexeraOrleansPrototype
             count += (int)row;
             intermediateAggregatorsResponded++;
 
-            if (intermediateAggregatorsResponded == Program.num_scan)
+            if (intermediateAggregatorsResponded == TexeraConfig.num_scan)
             {
                 row = count;
             }

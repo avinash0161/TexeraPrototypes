@@ -1,4 +1,4 @@
-#define PRINT_MESSAGE_ON
+// #define PRINT_MESSAGE_ON
 //#define PRINT_DROPPED_ON
 
 
@@ -33,7 +33,7 @@ namespace TexeraOrleansPrototype
             if (finished)
             Console.WriteLine("Ordered KeywordSearch Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
-            bool cond = Program.conditions_on ? (row as Tuple).region.Contains("Asia") : true;
+            bool cond = TexeraConfig.conditions_on ? (row as Tuple).region.Contains("Asia") : true;
             if ((row as Tuple).id == -1)
             {
                 Console.WriteLine("Ordered KeywordSearch done");
@@ -67,7 +67,7 @@ namespace TexeraOrleansPrototype
             if (finished)
             Console.WriteLine("Unordered KeywordSearch Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
-            bool cond = Program.conditions_on ? (row as Tuple).region.Contains("Asia") : true;
+            bool cond = TexeraConfig.conditions_on ? (row as Tuple).region.Contains("Asia") : true;
             if ((row as Tuple).id == -1)
             {
                 Console.WriteLine("Unordered KeywordSearch done");

@@ -1,4 +1,4 @@
-#define PRINT_MESSAGE_ON
+// #define PRINT_MESSAGE_ON
 //#define PRINT_DROPPED_ON
 
 
@@ -31,7 +31,7 @@ namespace TexeraOrleansPrototype
             if (finished)
             Console.WriteLine("Ordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
-            bool cond = Program.conditions_on ? (row as Tuple).unit_cost > 50 : true;
+            bool cond = TexeraConfig.conditions_on ? (row as Tuple).unit_cost > 50 : true;
             if ((row as Tuple).id == -1)
             {
                 Console.WriteLine("Ordered Filter done");
@@ -62,7 +62,7 @@ namespace TexeraOrleansPrototype
             if (finished)
             Console.WriteLine("Unordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
-            bool cond = Program.conditions_on ? (row as Tuple).unit_cost > 50 : true;
+            bool cond = TexeraConfig.conditions_on ? (row as Tuple).unit_cost > 50 : true;
             if ((row as Tuple).id == -1)
             {
                 Console.WriteLine("Unordered Filter done");
