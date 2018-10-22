@@ -1,4 +1,4 @@
-#define PRINT_MESSAGE_ON
+// #define PRINT_MESSAGE_ON
 //#define PRINT_DROPPED_ON
 
 
@@ -42,9 +42,9 @@ namespace TexeraOrleansPrototype
                 Console.WriteLine("Ordered KeywordSearch done");
                 finished = true;
             }
-            else if (cond)
-                (next_op as IOrderedCountOperator).SetAggregatorLevel(true);
-            else
+            // else if (cond)
+               // (next_op as IOrderedCountOperator).SetAggregatorLevel(true);
+            else if(!cond)
                 row = null;
             return Task.CompletedTask;
         }
@@ -80,9 +80,9 @@ namespace TexeraOrleansPrototype
                 Console.WriteLine("Unordered KeywordSearch done");
                 finished = true;
             }
-            else if (cond)
-                (next_op as ICountOperator).SetAggregatorLevel(true);
-            else
+            // else if (cond)
+            // (next_op as ICountOperator).SetAggregatorLevel(true);
+            else if(!cond)
                 row = null;
             return Task.CompletedTask;
         }

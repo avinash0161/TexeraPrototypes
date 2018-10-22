@@ -37,11 +37,11 @@ namespace TexeraOrleansPrototype
         {
             for (int i = 0; i < Rows.Count; ++i)
             {
-		Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending "+i.ToString());
+		// Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending "+i.ToString());
 		nextOperator.Process(Rows[i]);
 	        }
             nextOperator.Process(new Tuple((ulong)Rows.Count ,- 1, null));
-            Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
+            // Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
         }
 

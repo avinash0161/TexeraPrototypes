@@ -13,9 +13,9 @@ namespace TexeraOrleansPrototype
 {
     class Program
     {
-        public const int num_scan = 1;
+        public const int num_scan = 10;
         public const bool conditions_on = false;
-        public const bool ordered_on = false;
+        public const bool ordered_on = true;
         public const string dataset = "large";
         public const string delivery = "RPC";
         public const string dir= @"/home/sheng/datasets/";
@@ -26,7 +26,7 @@ namespace TexeraOrleansPrototype
                 .AddSimpleMessageStreamProvider("SMSProvider")
                 // add storage to store list of subscriptions
                 .AddMemoryGrainStorage("PubSubStore")
-                .UseDashboard(options => { })
+                .UseDashboard(options => {options.Port = 8086; })
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";
@@ -36,6 +36,7 @@ namespace TexeraOrleansPrototype
                     options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole())
                 .Configure<MessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 60; });
+
             using (var host = siloBuilder.Build())
             {
                 await host.StartAsync();
@@ -54,7 +55,7 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
-                    Guid streamGuid = await client.GetGrain<ICountOperator>(1).GetStreamGuid();
+                    Guid streamGuid = await client.GetGrain<ICountFinalOperator>(1).GetStreamGuid();
 
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
@@ -76,6 +77,11 @@ namespace TexeraOrleansPrototype
                     {
                         var t = client.GetGrain<IScanOperator>(i + 2);
                         operators.Add(t);
+
+                        client.GetGrain<IOrderedFilterOperator>(i+2);
+                        client.GetGrain<IOrderedKeywordSearchOperator>(i+2);
+                        client.GetGrain<IOrderedCountOperator>(i+2);
+                        client.GetGrain<IOrderedCountFinalOperator>(1);
                     }
                     Thread.Sleep(1000);
                     Console.WriteLine("Start loading tuples");

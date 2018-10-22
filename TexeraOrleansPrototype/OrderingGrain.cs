@@ -12,6 +12,7 @@ namespace TexeraOrleansPrototype
         private ulong current_idx = 0;
         private ulong current_seq_num = 0;
         public INormalGrain next_op = null;
+        
         public Task Process(object obj)
         {
             var seq_token = (obj as Tuple).seq_token;
@@ -22,6 +23,7 @@ namespace TexeraOrleansPrototype
             }
             if (seq_token != current_idx)
             {
+                Console.WriteLine("being put in stashed");
                 stashed.Add(seq_token, obj);
             }
             else
@@ -29,10 +31,14 @@ namespace TexeraOrleansPrototype
                 Process_impl(ref obj);
                 if (obj != null)
                 {
-                    if (next_op is IOrderingGrain)
-                        (obj as Tuple).seq_token = current_seq_num++;
-                    if (next_op != null)
-                        next_op.Process(obj);
+                    if(next_op != null)
+                    {
+                        if (next_op is IOrderingGrain)
+                            (obj as Tuple).seq_token = current_seq_num++;
+                        if (next_op != null)
+                            next_op.Process(obj);
+                    }
+                    
                 }
                 current_idx++;
                 ProcessStashed();

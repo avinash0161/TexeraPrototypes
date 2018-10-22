@@ -8,7 +8,7 @@ using System.IO;
 namespace TexeraOrleansPrototype
 {
 
-    public class OrderedCountOperator : OrderingGrain, IOrderedCountOperator
+    public class OrderedCountFinalOperator : OrderingGrain, IOrderedCountFinalOperator
     {
         private Guid guid = Guid.NewGuid();
         public bool isIntermediate = false;
@@ -20,24 +20,24 @@ namespace TexeraOrleansPrototype
         //     return Task.CompletedTask;
         // }
 
-        // public Task<Guid> GetStreamGuid()
-        // {
-        //     return Task.FromResult(guid);
-        // }
+        public Task<Guid> GetStreamGuid()
+        {
+            return Task.FromResult(guid);
+        }
 
-        // public Task SubmitIntermediateAgg(int aggregation)
-        // {
-        //     count += aggregation;
-        //     intermediateAggregatorsResponded++;
+        public Task SubmitIntermediateAgg(int aggregation)
+        {
+            count += aggregation;
+            intermediateAggregatorsResponded++;
 
-        //     if (intermediateAggregatorsResponded == Program.num_scan)
-        //     {
-        //         var streamProvider = GetStreamProvider("SMSProvider");
-        //         var stream = streamProvider.GetStream<int>(guid, "Random");
-        //         stream.OnNextAsync(count);
-        //     }
-        //     return Task.CompletedTask;
-        // }
+            if (intermediateAggregatorsResponded == Program.num_scan)
+            {
+                var streamProvider = GetStreamProvider("SMSProvider");
+                var stream = streamProvider.GetStream<int>(guid, "Random");
+                stream.OnNextAsync(count);
+            }
+            return Task.CompletedTask;
+        }
 
         public override Task Process_impl(ref object row)
         {
@@ -58,10 +58,10 @@ namespace TexeraOrleansPrototype
 
 
 
-    public class CountOperator : NormalGrain, ICountOperator
+    public class CountFinalOperator : NormalGrain, ICountFinalOperator
     {
         private Guid guid = Guid.NewGuid();
-        // public bool isIntermediate = false;
+        public bool isIntermediate = false;
         public int count = 0;
         public int intermediateAggregatorsResponded = 0;
         // public Task SetAggregatorLevel(bool isIntermediate)
@@ -70,24 +70,24 @@ namespace TexeraOrleansPrototype
         //     return Task.CompletedTask;
         // }
 
-        // public Task<Guid> GetStreamGuid()
-        // {
-        //     return Task.FromResult(guid);
-        // }
+        public Task<Guid> GetStreamGuid()
+        {
+            return Task.FromResult(guid);
+        }
 
-        // public Task SubmitIntermediateAgg(int aggregation)
-        // {
-        //     count += aggregation;
-        //     intermediateAggregatorsResponded++;
+        public Task SubmitIntermediateAgg(int aggregation)
+        {
+            count += aggregation;
+            intermediateAggregatorsResponded++;
 
-        //     if (intermediateAggregatorsResponded == Program.num_scan)
-        //     {
-        //         var streamProvider = GetStreamProvider("SMSProvider");
-        //         var stream = streamProvider.GetStream<int>(guid, "Random");
-        //         stream.OnNextAsync(count);
-        //     }
-        //     return Task.CompletedTask;
-        // }
+            if (intermediateAggregatorsResponded == Program.num_scan)
+            {
+                var streamProvider = GetStreamProvider("SMSProvider");
+                var stream = streamProvider.GetStream<int>(guid, "Random");
+                stream.OnNextAsync(count);
+            }
+            return Task.CompletedTask;
+        }
 
         public override Task Process_impl(ref object row)
         {
