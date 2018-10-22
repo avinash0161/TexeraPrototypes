@@ -11,15 +11,15 @@ namespace TexeraOrleansPrototype
     public class ScanOperator : Grain, IScanOperator
     {
         public List<Tuple> Rows = new List<Tuple>();
-        public INormalGrain nextOperator;
+        public IOrderingGrain nextOperator;
         System.IO.StreamReader file;
 
         public override Task OnActivateAsync()
         {
             if(Program.ordered_on)
                 nextOperator = base.GrainFactory.GetGrain<IOrderedFilterOperator>(this.GetPrimaryKeyLong());
-            else
-                nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
+            // else
+                // nextOperator = base.GrainFactory.GetGrain<IFilterOperator>(this.GetPrimaryKeyLong());
             string p2;
             if (Program.num_scan == 1)
                 p2 = Program.dir + Program.dataset + "_input.csv";
@@ -41,7 +41,7 @@ namespace TexeraOrleansPrototype
 		nextOperator.Process(Rows[i]);
 	        }
             nextOperator.Process(new Tuple((ulong)Rows.Count ,- 1, null));
-            // Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
+            Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
         }
 

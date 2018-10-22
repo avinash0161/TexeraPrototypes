@@ -33,7 +33,7 @@ namespace TexeraOrleansPrototype
             bool cond = Program.conditions_on ? (row as Tuple).unit_cost > 50 : true;
             if ((row as Tuple).id == -1)
             {
-                Console.WriteLine("Ordered Filter done");
+                Console.WriteLine("Ordered Filter " + (this.GetPrimaryKeyLong() - 1).ToString() + " done ");
                 finished = true;
             }
             else if (!cond)

@@ -23,7 +23,7 @@ namespace TexeraOrleansPrototype
             }
             if (seq_token != current_idx)
             {
-                Console.WriteLine("being put in stashed");
+                // Console.WriteLine("being put in stashed");
                 stashed.Add(seq_token, obj);
             }
             else
