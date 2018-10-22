@@ -18,6 +18,7 @@ namespace TexeraOrleansPrototype
         {
             var siloBuilder = new SiloHostBuilder()
                 .UseLocalhostClustering()
+                .UseDashboard(options => {options.Port = 8086; })
                 .AddSimpleMessageStreamProvider("SMSProvider")
                 // add storage to store list of subscriptions
                 .AddMemoryGrainStorage("PubSubStore")
