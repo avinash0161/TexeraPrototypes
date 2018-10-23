@@ -78,6 +78,7 @@ namespace TexeraOrleansPrototype
                         var t = client.GetGrain<IScanOperator>(i + 2);
                         operators.Add(t);
 
+                        // Explicitly activating other grains
                         client.GetGrain<IOrderedFilterOperator>(i+2);
                         client.GetGrain<IOrderedKeywordSearchOperator>(i+2);
                         client.GetGrain<IOrderedCountOperator>(i+2);
