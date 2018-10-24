@@ -43,7 +43,7 @@ namespace TexeraOrleansPrototype
         {
             if ((row as Tuple).id == -1)
             {
-                ICountFinalOperator finalAggregator = this.GrainFactory.GetGrain<ICountFinalOperator>(1);
+                IOrderedCountFinalOperator finalAggregator = this.GrainFactory.GetGrain<IOrderedCountFinalOperator>(1);
                 // finalAggregator.SetAggregatorLevel(false);
                 finalAggregator.SubmitIntermediateAgg(count);
             }

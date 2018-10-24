@@ -12,6 +12,16 @@ namespace TexeraOrleansPrototype
         private ulong current_idx = 0;
         private ulong current_seq_num = 0;
         public INormalGrain next_op = null;
+
+        public Task TrivialCall()
+        {
+            for(int i=0; i< 100000; i++)
+            {
+                int a = 1;
+            }
+
+            return Task.CompletedTask;
+        }
         
         public Task Process(object obj)
         {

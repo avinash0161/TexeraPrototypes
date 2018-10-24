@@ -55,7 +55,7 @@ namespace TexeraOrleansPrototype
                 {
                     await client.Connect();
 
-                    Guid streamGuid = await client.GetGrain<ICountFinalOperator>(1).GetStreamGuid();
+                    Guid streamGuid = await client.GetGrain<IOrderedCountFinalOperator>(1).GetStreamGuid();
 
                     Console.WriteLine("Client side guid is " + streamGuid);
                     var stream = client.GetStreamProvider("SMSProvider")
@@ -79,10 +79,14 @@ namespace TexeraOrleansPrototype
                         operators.Add(t);
 
                         // Explicitly activating other grains
-                        client.GetGrain<IOrderedFilterOperator>(i+2);
-                        client.GetGrain<IOrderedKeywordSearchOperator>(i+2);
-                        client.GetGrain<IOrderedCountOperator>(i+2);
-                        client.GetGrain<IOrderedCountFinalOperator>(1);
+                        await client.GetGrain<IOrderedFilterOperator>(i+2).TrivialCall();
+                        
+                        await client.GetGrain<IOrderedKeywordSearchOperator>(i+2).TrivialCall();
+                        
+                        await client.GetGrain<IOrderedCountOperator>(i+2).TrivialCall();
+                        
+                        await client.GetGrain<IOrderedCountFinalOperator>(1).TrivialCall();
+                        
                     }
                     Thread.Sleep(1000);
                     Console.WriteLine("Start loading tuples");
