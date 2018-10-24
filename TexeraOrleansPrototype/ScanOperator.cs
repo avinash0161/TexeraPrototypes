@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using Orleans.Concurrency;
 
 namespace TexeraOrleansPrototype
 {
     public class ScanOperator : Grain, IScanOperator
     {
-        public List<Tuple> Rows = new List<Tuple>();
+        public List<Immutable<Tuple>> Rows = new List<Immutable<Tuple>>();
         public IOrderingGrain nextOperator;
         System.IO.StreamReader file;
 
@@ -40,7 +41,7 @@ namespace TexeraOrleansPrototype
 		// Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending "+i.ToString());
 		nextOperator.Process(Rows[i]);
 	        }
-            nextOperator.Process(new Tuple((ulong)Rows.Count ,- 1, null));
+            nextOperator.Process(new Immutable<Tuple>(new Tuple((ulong)Rows.Count ,- 1, null)));
             Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " sending done");
             return Task.CompletedTask;
         }
@@ -52,7 +53,7 @@ namespace TexeraOrleansPrototype
             ulong count = 0;
             while ((line = file.ReadLine()) != null)
             {
-                Rows.Add(new Tuple(count, (int)count, line.Split(",")));
+                Rows.Add(new Immutable<Tuple>(new Tuple(count, (int)count, line.Split(","))));
                 count++;
             }
             Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " loading done");

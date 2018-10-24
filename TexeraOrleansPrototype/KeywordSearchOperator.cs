@@ -27,7 +27,7 @@ namespace TexeraOrleansPrototype
             return Task.FromResult(guid);
         }
 
-        public override Task Process_impl(ref object row)
+        public override Task Process_impl(ref Tuple row)
         {
 #if PRINT_MESSAGE_ON
             Console.WriteLine("Ordered KeywordSearch Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
@@ -65,7 +65,7 @@ namespace TexeraOrleansPrototype
             return Task.FromResult(guid);
         }
 
-        public override Task Process_impl(ref object row)
+        public override Task Process_impl(ref Tuple row)
         {
 #if PRINT_MESSAGE_ON
             Console.WriteLine("Unordered KeywordSearch Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);

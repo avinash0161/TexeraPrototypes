@@ -39,7 +39,7 @@ namespace TexeraOrleansPrototype
         //     return Task.CompletedTask;
         // }
 
-        public override Task Process_impl(ref object row)
+        public override Task Process_impl(ref Tuple row)
         {
             if ((row as Tuple).id == -1)
             {
@@ -89,7 +89,7 @@ namespace TexeraOrleansPrototype
         //     return Task.CompletedTask;
         // }
 
-        public override Task Process_impl(ref object row)
+        public override Task Process_impl(ref Tuple row)
         {
             if ((row as Tuple).id == -1)
             {

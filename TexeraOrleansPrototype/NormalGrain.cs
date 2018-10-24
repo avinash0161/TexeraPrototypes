@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using Orleans.Concurrency;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,20 +22,22 @@ namespace TexeraOrleansPrototype
             return Task.CompletedTask;
         }
 
-        public Task Process(object obj)
+        public Task Process(Immutable<Tuple> obj)
         {
-            Process_impl(ref obj);
-            if (obj != null)
+            Tuple tuple=obj.Value;
+
+            Process_impl(ref tuple);
+            if (tuple != null)
             {
                 if (next_op is IOrderingGrain)
-                    (obj as Tuple).seq_token = current_seq_num++;
+                    tuple.seq_token = current_seq_num++;
                 if (next_op != null)
-                    next_op.Process(obj);
+                    next_op.Process(new Immutable<Tuple>(tuple));
             }
             return Task.CompletedTask;
         }
 
-        public virtual Task Process_impl(ref object row)
+        public virtual Task Process_impl(ref Tuple row)
         {
             Console.WriteLine("OrderingGrain Process: " + row);
             return Task.CompletedTask;

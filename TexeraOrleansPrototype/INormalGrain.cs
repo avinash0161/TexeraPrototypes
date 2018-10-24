@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using Orleans.Concurrency;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ namespace TexeraOrleansPrototype
 {
     public interface INormalGrain : IGrainWithIntegerKey
     {
-        Task Process(object row);
+        Task Process(Immutable<Tuple> row);
         Task TrivialCall();
     }
 }

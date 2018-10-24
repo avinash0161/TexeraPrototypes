@@ -21,7 +21,7 @@ namespace TexeraOrleansPrototype
             return base.OnActivateAsync();
         }
 
-        public override Task Process_impl(ref object row)
+        public override Task Process_impl(ref Tuple row)
         {
 #if PRINT_MESSAGE_ON
             Console.WriteLine("Ordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
@@ -51,7 +51,7 @@ namespace TexeraOrleansPrototype
             return base.OnActivateAsync();
         }
 
-        public override Task Process_impl(ref object row)
+        public override Task Process_impl(ref Tuple row)
         {
 #if PRINT_MESSAGE_ON
             Console.WriteLine("Unordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);

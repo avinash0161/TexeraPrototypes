@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 
 namespace TexeraOrleansPrototype
 {
     public class OrderingGrain: Grain
     {
-        private Dictionary<ulong, object> stashed = new Dictionary<ulong, object>();
+        private Dictionary<ulong, Tuple> stashed = new Dictionary<ulong, Tuple>();
         private ulong current_idx = 0;
         private ulong current_seq_num = 0;
         public INormalGrain next_op = null;
@@ -23,9 +24,10 @@ namespace TexeraOrleansPrototype
             return Task.CompletedTask;
         }
         
-        public Task Process(object obj)
+        public Task Process(Immutable<Tuple> obj)
         {
-            var seq_token = (obj as Tuple).seq_token;
+            var seq_token = obj.Value.seq_token;
+            Tuple tuple=obj.Value;
             if(seq_token < current_idx)
             {
                 // de-dup messages
@@ -34,19 +36,19 @@ namespace TexeraOrleansPrototype
             if (seq_token != current_idx)
             {
                 // Console.WriteLine("being put in stashed");
-                stashed.Add(seq_token, obj);
+                stashed.Add(seq_token, tuple);
             }
             else
             {
-                Process_impl(ref obj);
-                if (obj != null)
+                Process_impl(ref tuple);
+                if (tuple != null)
                 {
                     if(next_op != null)
                     {
                         if (next_op is IOrderingGrain)
-                            (obj as Tuple).seq_token = current_seq_num++;
+                            tuple.seq_token = current_seq_num++;
                         if (next_op != null)
-                            next_op.Process(obj);
+                            next_op.Process(new Immutable<Tuple>(tuple));
                     }
                     
                 }
@@ -56,7 +58,7 @@ namespace TexeraOrleansPrototype
             return Task.CompletedTask;
         }
 
-        public virtual Task Process_impl(ref object row)
+        public virtual Task Process_impl(ref Tuple row)
         {
             Console.WriteLine("OrderingGrain Process: " + row);
             return Task.CompletedTask;
@@ -73,9 +75,9 @@ namespace TexeraOrleansPrototype
                     if (obj != null)
                     {
                         if (next_op is IOrderingGrain)
-                            (obj as Tuple).seq_token = current_seq_num++;
+                            obj.seq_token = current_seq_num++;
                         if (next_op != null)
-                            next_op.Process(obj);
+                            next_op.Process(new Immutable<Tuple>(obj));
                     }
                     stashed.Remove(current_idx);
                     current_idx++;
