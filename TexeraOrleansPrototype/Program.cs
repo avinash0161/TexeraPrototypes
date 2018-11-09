@@ -16,9 +16,9 @@ namespace TexeraOrleansPrototype
         public const int num_scan = 10;
         public const bool conditions_on = false;
         public const bool ordered_on = true;
-        public const string dataset = "large";
+        public const string dataset = "median";
         public const string delivery = "RPC";
-        public const string dir= @"/home/sheng/datasets/";
+        public const string dir= @"D:/";
         static async Task Main(string[] args)
         {
             var siloBuilder = new SiloHostBuilder()
@@ -35,7 +35,7 @@ namespace TexeraOrleansPrototype
                 .Configure<EndpointOptions>(options =>
                     options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole())
-                .Configure<MessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 60; });
+                .Configure<SiloMessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 2; });
 
             using (var host = siloBuilder.Build())
             {
@@ -49,8 +49,8 @@ namespace TexeraOrleansPrototype
                         options.ClusterId = "dev";
                         options.ServiceId = "TexeraOrleansPrototype";
                     })
-                    .ConfigureLogging(logging => logging.AddConsole());
-
+                    .ConfigureLogging(logging => logging.AddConsole())
+                    .Configure<ClientMessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 2; });
                 using (var client = clientBuilder.Build())
                 {
                     await client.Connect();
