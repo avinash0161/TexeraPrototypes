@@ -31,7 +31,7 @@ namespace TexeraOrleansPrototype
                 .Configure<EndpointOptions>(options =>
                     options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Critical).AddConsole())
-                .Configure<MessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 60; });
+                .Configure<SiloMessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 2; });
 
             using (var host = siloBuilder.Build())
             {
@@ -45,8 +45,8 @@ namespace TexeraOrleansPrototype
                         options.ClusterId = "dev";
                         options.ServiceId = "TexeraOrleansPrototype";
                     })
-                    .ConfigureLogging(logging => logging.AddConsole());
-
+                    .ConfigureLogging(logging => logging.AddConsole())
+                    .Configure<ClientMessagingOptions>(options => { options.ResendOnTimeout = true; options.MaxResendCount = 2; });
                 using (var client = clientBuilder.Build())
                 {
                     await client.Connect();
