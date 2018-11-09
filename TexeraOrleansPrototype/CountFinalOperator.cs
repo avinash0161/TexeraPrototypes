@@ -54,6 +54,10 @@ namespace TexeraOrleansPrototype
             }
             return Task.CompletedTask;
         }
+        public override string GetName()
+        {
+            return "Ordered CountFinal " + (this.GetPrimaryKeyLong() - 1).ToString();
+        }
     }
 
 
@@ -103,6 +107,10 @@ namespace TexeraOrleansPrototype
                 count++;
             }
             return Task.CompletedTask;
+        }
+        public override string GetName()
+        {
+            return "Unordered CountFinal " + (this.GetPrimaryKeyLong() - 1).ToString();
         }
     }
 

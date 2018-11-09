@@ -42,5 +42,11 @@ namespace TexeraOrleansPrototype
             Console.WriteLine("OrderingGrain Process: " + row);
             return Task.CompletedTask;
         }
+        public virtual string GetName()
+        {
+            return "NormalGrain " + (this.GetPrimaryKeyLong() - 1).ToString();
+        }
+
+
     }
 }

@@ -16,6 +16,7 @@ namespace TexeraOrleansPrototype
         public const int num_scan = 10;
         public const bool conditions_on = false;
         public const bool ordered_on = true;
+        public const bool count_stashed = true;
         public const string dataset = "median";
         public const string delivery = "RPC";
         public const string dir= @"D:/";
@@ -100,7 +101,17 @@ namespace TexeraOrleansPrototype
                         operators[i].SubmitTuples();
                     }
                     Console.ReadLine();
-                    
+                    for (int i = 0; i < num_scan; ++i)
+                    {
+                        // Explicitly activating other grains
+                        await client.GetGrain<IOrderedFilterOperator>(i + 2).PrintStashCount();
+
+                        await client.GetGrain<IOrderedKeywordSearchOperator>(i + 2).PrintStashCount();
+
+                        await client.GetGrain<IOrderedCountOperator>(i + 2).PrintStashCount();
+
+                    }
+                    await client.GetGrain<IOrderedCountFinalOperator>(1).PrintStashCount();
                 }
             }
         }

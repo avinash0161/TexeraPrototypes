@@ -8,6 +8,6 @@ namespace TexeraOrleansPrototype
 {
     public interface IOrderingGrain: INormalGrain
     {
-    
+        Task PrintStashCount();
     }
 }

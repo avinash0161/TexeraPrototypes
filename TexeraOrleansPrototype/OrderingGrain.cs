@@ -12,6 +12,7 @@ namespace TexeraOrleansPrototype
         private Dictionary<ulong, Tuple> stashed = new Dictionary<ulong, Tuple>();
         private ulong current_idx = 0;
         private ulong current_seq_num = 0;
+        private ulong stashed_count = 0;
         public INormalGrain next_op = null;
 
         public Task TrivialCall()
@@ -35,7 +36,7 @@ namespace TexeraOrleansPrototype
             }
             if (seq_token != current_idx)
             {
-                // Console.WriteLine("being put in stashed");
+                stashed_count++;
                 stashed.Add(seq_token, tuple);
             }
             else
@@ -63,6 +64,18 @@ namespace TexeraOrleansPrototype
             Console.WriteLine("OrderingGrain Process: " + row);
             return Task.CompletedTask;
         }
+
+        public virtual string GetName()
+        {
+            return "OrderingGrain " + (this.GetPrimaryKeyLong() - 1).ToString();
+        }
+
+        public Task PrintStashCount()
+        {
+            Console.WriteLine(GetName() + " stashed " + stashed_count.ToString() + " messages");
+            return Task.CompletedTask;
+        }
+
 
         private void ProcessStashed()
         {

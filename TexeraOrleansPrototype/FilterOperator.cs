@@ -24,21 +24,25 @@ namespace TexeraOrleansPrototype
         public override Task Process_impl(ref Tuple row)
         {
 #if PRINT_MESSAGE_ON
-            Console.WriteLine("Ordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
+            Console.WriteLine(GetName() +" Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
 #if PRINT_DROPPED_ON
             if (finished)
-            Console.WriteLine("Ordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
+            Console.WriteLine(GetName() +" Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
             bool cond = Program.conditions_on ? (row as Tuple).unit_cost > 50 : true;
             if ((row as Tuple).id == -1)
             {
-                Console.WriteLine("Ordered Filter " + (this.GetPrimaryKeyLong() - 1).ToString() + " done ");
+                Console.WriteLine(GetName() + " done ");
                 finished = true;
             }
             else if (!cond)
                 row = null;
             return Task.CompletedTask;
+        }
+        public override string GetName()
+        {
+            return "Ordered Filter " + (this.GetPrimaryKeyLong() - 1).ToString();
         }
     }
 
@@ -54,22 +58,28 @@ namespace TexeraOrleansPrototype
         public override Task Process_impl(ref Tuple row)
         {
 #if PRINT_MESSAGE_ON
-            Console.WriteLine("Unordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
+            Console.WriteLine(GetName() +" Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
 #if PRINT_DROPPED_ON
             if (finished)
-            Console.WriteLine("Unordered Filter Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
+            Console.WriteLine(GetName() +" Process: [" + (row as Tuple).seq_token + "] " + (row as Tuple).id);
 #endif
             bool cond = Program.conditions_on ? (row as Tuple).unit_cost > 50 : true;
             if ((row as Tuple).id == -1)
             {
-                Console.WriteLine("Unordered Filter done");
+                Console.WriteLine(GetName() + " done");
                 finished = true;
             }
             else if (!cond)
                 row = null;
             return Task.CompletedTask;
         }
+
+        public override string GetName()
+        {
+            return "Unordered Filter " + (this.GetPrimaryKeyLong() - 1).ToString();
+        }
+
     }
 
 }

@@ -59,6 +59,5 @@ namespace TexeraOrleansPrototype
             Console.WriteLine("Scan " + (this.GetPrimaryKeyLong() - 1).ToString() + " loading done");
             return Task.CompletedTask;
         }
-       
     }
 }

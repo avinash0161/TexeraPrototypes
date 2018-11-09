@@ -20,8 +20,6 @@ namespace TexeraOrleansPrototype
             return Task.CompletedTask;
         }
 
-
-
         public Task OnCompletedAsync()
         {
             Console.WriteLine("Chatroom message stream received stream completed event");
@@ -39,7 +37,6 @@ namespace TexeraOrleansPrototype
             sw.Stop();
             Console.WriteLine("Time usage: " + sw.Elapsed);
             Console.WriteLine($"=={item}== count received: by client");
-            Environment.Exit(0);
             return Task.CompletedTask;
         }
     }
